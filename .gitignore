@@ -1,0 +1,5 @@
+﻿.vscode/*
+!.vscode/launch.json
+
+compressed.txt
+images
