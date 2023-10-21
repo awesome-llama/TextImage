@@ -2,19 +2,12 @@
 
 from PIL import Image
 import numpy as np
-import layer_utils
 import layer_RGB8
-#import layer.A8
-
-FILE_PATH = 'C:/Users/Atlas/Documents/Scratch/Image Format 2/image_format'
-
-
+#import layer_A8
 
 debug_dimensions = ()
 
-
-
-def compress_img(image_name, path=FILE_PATH, lossy_tolerance=0):
+def compress_img(image_name, path='', lossy_tolerance=0):
     """Open an image and compress it. Save."""
     
     image = Image.open(path+image_name)
@@ -35,7 +28,7 @@ def compress_img(image_name, path=FILE_PATH, lossy_tolerance=0):
 
 ##############
 
-def decompress_img(image_name, path=FILE_PATH):
+def decompress_img(image_name, path=''):
     
     with open(path+image_name) as f:
         image = f.read()
@@ -53,10 +46,7 @@ def decompress_img(image_name, path=FILE_PATH):
 
     image = Image.fromarray(obj=image_array, mode='RGB')
     image.show()
-    image.save(path + 'decompressed_test.png')
-
-
-
+    image.save(path + 'decompressed.png')
 
 
 if __name__ == '__main__':
@@ -68,7 +58,6 @@ if __name__ == '__main__':
     #compress_img('images/region_landing_pad_night.png', lossy_tolerance=20)
     #compress_img('images/boat.png', lossy_tolerance=1)
     #compress_img('images/testcard.png')
-    #compress_img('blender google fail.png', 'C:/Users/Atlas/Documents/HDR/')
     #compress_img('images/breakable_atlas.png')
     #compress_img('images/nprguy.jpg')
     #compress_img('images/rgb8.png')

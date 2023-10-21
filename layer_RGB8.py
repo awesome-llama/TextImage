@@ -1,10 +1,7 @@
 # RGB 8-bit per channel
 
-#from PIL import Image
-#import numpy as np
 import json
 import layer_utils as lu
-
 
 DEFAULT_VAL = (0,0,0)
 VOLUMES = [[(-2,-1,-1),(5,4,4),1],[(-2,3,-1),(5,4,4),1],[(-2,-5,-1),(5,4,4),1],[(-2,-5,2),(5,4,4),1],[(-2,3,2),(5,4,4),1],[(-2,-1,2),(5,4,4),1],[(-2,-5,-5),(5,4,4),1],[(-2,3,-5),(5,4,4),1],[(-2,-1,-5),(5,4,4),1],[(3,-1,-5),(5,4,4),1],[(3,3,-5),(5,4,4),1],[(3,-5,-5),(5,4,4),1],[(3,-1,2),(5,4,4),1],[(3,3,2),(5,4,4),1],[(3,-5,2),(5,4,4),1],[(3,-5,-1),(5,4,4),1],[(3,3,-1),(5,4,4),1],[(3,-1,-1),(5,4,4),1],[(8,-1,-1),(5,4,4),1],[(8,3,-1),(5,4,4),1],[(8,-5,-1),(5,4,4),1],[(8,-5,2),(5,4,4),1],[(8,3,2),(5,4,4),1],[(8,-1,2),(5,4,4),1],[(8,-5,-5),(5,4,4),1],[(8,3,-5),(5,4,4),1],[(8,-1,-5),(5,4,4),1],[(-7,-1,-5),(5,4,4),1],[(-7,3,-5),(5,4,4),1],[(-7,-5,-5),(5,4,4),1],[(-7,-1,2),(5,4,4),1],[(-7,3,2),(5,4,4),1],[(-7,-5,2),(5,4,4),1],[(-7,-5,-1),(5,4,4),1],[(-7,3,-1),(5,4,4),1],[(-7,-1,-1),(5,4,4),1],[(-12,-1,-1),(5,4,4),1],[(-12,3,-1),(5,4,4),1],[(-12,-5,-1),(5,4,4),1],[(-12,-5,2),(5,4,4),1],[(-12,3,2),(5,4,4),1],[(-12,-1,2),(5,4,4),1],[(-12,-5,-5),(5,4,4),1],[(-12,3,-5),(5,4,4),1],[(-12,-1,-5),(5,4,4),1],[(-10,7,-9),(21,20,20),2],[(-10,-25,-9),(21,20,20),2],[(-10,-9,7),(21,20,20),2],[(-10,-9,-24),(21,20,20),2],[(11,-9,-8),(21,20,20),2],[(-31,-9,-8),(21,20,20),2],[(32,-9,-8),(21,20,20),2],[(-52,-9,-8),(21,20,20),2],[(53,-9,-8),(21,20,20),2],[(-73,-9,-8),(21,20,20),2],[(11,-9,-24),(21,20,20),2],[(11,-9,7),(21,20,20),2],[(11,-25,-9),(21,20,20),2],[(11,7,-9),(21,20,20),2],[(-31,7,-9),(21,20,20),2],[(-31,-25,-9),(21,20,20),2],[(-31,-9,7),(21,20,20),2],[(-10,11,-29),(21,20,20),2]]
@@ -167,27 +164,23 @@ def chunk_RLE(chunks):
     return chunks_RLE
 
 
-def compress(image_array:list, dimensions:tuple, lossy_tolerance=0):
+def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, debug=False):
     """Compress RGB 8 bit per channel data stream"""
 
-    # get a list of chunks:
-    chunks = data_stream_to_chunks(image_array, dimensions, lossy_tolerance)
+    chunks = data_stream_to_chunks(image_array, dimensions, lossy_tolerance) # get a list of chunks
+    if RLE: chunks = chunk_RLE(chunks) # second pass for RLE
 
-    # second pass for RLE:
-    chunks = chunk_RLE(chunks)
-
-    lu.analyse_chunks(chunks)
-    
-    with open('dump new.json', 'w') as f:
-        f.write(json.dumps(chunks, indent=2))
-
+    if debug:
+        lu.analyse_chunks(chunks)
+        with open('RGB8_compress_chunks.json', 'w') as f:
+            f.write(json.dumps(chunks, indent=2))
 
     # final pass to convert chunks into strings:
     string_chunks = []
     for chunk_name, chunk_data in chunks:
         string_chunks.append(lu.index_to_txt(get_op_index(chunk_name)) + lu.index_to_txt(chunk_data))
 
-    if True:
+    if debug:
         size_pixels = dimensions[0]*dimensions[1]
         size_compressed = len(''.join(string_chunks))
         print('b64:' , 4*size_pixels, '-> compressed:' , size_compressed)
@@ -199,12 +192,12 @@ def compress(image_array:list, dimensions:tuple, lossy_tolerance=0):
 
 
 
-def decompress(stream:str, dimensions:tuple):
+def decompress(stream:str, dimensions:tuple, debug=False):
     """Decompress RGB 8 bit per channel data stream"""
 
     def _add_colour(colour: tuple, op_name):
         #size = get_op_size(op_name)
-        #image_array.append((size*63,size*63,size*63))
+        #image_array.append((size*63,size*63,size*63)) # preview efficiency
         image_array.append(colour)
         col_prev.insert(0, colour)
         col_prev.pop(-1)
@@ -270,9 +263,9 @@ def decompress(stream:str, dimensions:tuple):
         chunks.append((op_name, op_data))
         i += 1
 
-
-    with open('dump_decompress.json', 'w') as f:
-        f.write(json.dumps(chunks, indent=2))
+    if debug:
+        with open('RGB8_decompress_chunks.json', 'w') as f:
+            f.write(json.dumps(chunks, indent=2))
     
     # read intermediate and emit pixels into output list
     image_array = []
@@ -287,13 +280,13 @@ def decompress(stream:str, dimensions:tuple):
 
             for i in range(repeat):
                 i = i*op_size+2
-                
                 _process_op(op_name, chunk_data[i:i+op_size])
         
         else: _process_op(chunk_name, chunk_data)
 
-    #with open('dump_decompress_nums.json', 'w') as f:
-    #    f.write(json.dumps(image_array, indent=2))
+    if debug:
+        with open('RGB8_decompress_image_array.json', 'w') as f:
+            f.write(json.dumps(image_array, indent=2))
 
     return image_array
     
