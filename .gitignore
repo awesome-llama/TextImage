@@ -2,5 +2,6 @@
 !.vscode/launch.json
 
 compressed.txt
-images
 __pycache__
+A8_decompress_chunks.json
+RGB8_decompress_chunks.json
