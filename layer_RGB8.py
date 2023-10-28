@@ -5,7 +5,7 @@ import layer_utils as lu
 
 DEFAULT_VAL = (0,0,0)
 VOLUMES = [[(-2,-1,-1),(5,4,4),1],[(-2,3,-1),(5,4,4),1],[(-2,-5,-1),(5,4,4),1],[(-2,-5,2),(5,4,4),1],[(-2,3,2),(5,4,4),1],[(-2,-1,2),(5,4,4),1],[(-2,-5,-5),(5,4,4),1],[(-2,3,-5),(5,4,4),1],[(-2,-1,-5),(5,4,4),1],[(3,-1,-5),(5,4,4),1],[(3,3,-5),(5,4,4),1],[(3,-5,-5),(5,4,4),1],[(3,-1,2),(5,4,4),1],[(3,3,2),(5,4,4),1],[(3,-5,2),(5,4,4),1],[(3,-5,-1),(5,4,4),1],[(3,3,-1),(5,4,4),1],[(3,-1,-1),(5,4,4),1],[(8,-1,-1),(5,4,4),1],[(8,3,-1),(5,4,4),1],[(8,-5,-1),(5,4,4),1],[(8,-5,2),(5,4,4),1],[(8,3,2),(5,4,4),1],[(8,-1,2),(5,4,4),1],[(8,-5,-5),(5,4,4),1],[(8,3,-5),(5,4,4),1],[(8,-1,-5),(5,4,4),1],[(-7,-1,-5),(5,4,4),1],[(-7,3,-5),(5,4,4),1],[(-7,-5,-5),(5,4,4),1],[(-7,-1,2),(5,4,4),1],[(-7,3,2),(5,4,4),1],[(-7,-5,2),(5,4,4),1],[(-7,-5,-1),(5,4,4),1],[(-7,3,-1),(5,4,4),1],[(-7,-1,-1),(5,4,4),1],[(-12,-1,-1),(5,4,4),1],[(-12,3,-1),(5,4,4),1],[(-12,-5,-1),(5,4,4),1],[(-12,-5,2),(5,4,4),1],[(-12,3,2),(5,4,4),1],[(-12,-1,2),(5,4,4),1],[(-12,-5,-5),(5,4,4),1],[(-12,3,-5),(5,4,4),1],[(-12,-1,-5),(5,4,4),1],[(-10,7,-9),(21,20,20),2],[(-10,-25,-9),(21,20,20),2],[(-10,-9,7),(21,20,20),2],[(-10,-9,-24),(21,20,20),2],[(11,-9,-8),(21,20,20),2],[(-31,-9,-8),(21,20,20),2],[(32,-9,-8),(21,20,20),2],[(-52,-9,-8),(21,20,20),2],[(53,-9,-8),(21,20,20),2],[(-73,-9,-8),(21,20,20),2],[(11,-9,-24),(21,20,20),2],[(11,-9,7),(21,20,20),2],[(11,-25,-9),(21,20,20),2],[(11,7,-9),(21,20,20),2],[(-31,7,-9),(21,20,20),2],[(-31,-25,-9),(21,20,20),2],[(-31,-9,7),(21,20,20),2],[(-10,11,-29),(21,20,20),2]]
-OPERATIONS = [["raw",0,3],["raw",1,3],["raw",2,3],["raw",3,3],["raw",4,3],["raw",5,3],["raw",6,3],["raw",7,3],["raw",8,3],["raw",9,3],["raw",10,3],["raw",11,3],["raw",12,3],["raw",13,3],["raw",14,3],["raw",15,3],["raw",16,3],["raw",17,3],["raw",18,3],["raw",19,3],["raw",20,3],["raw",21,3],["copy_prev",0,0],["copy_vert_fwd",0,0],["copy_vert",0,0],["copy_vert_back",0,0],["hash_table",0,1],["repeat_op",0,3],["vol",0,1],["vol",1,1],["vol",2,1],["vol",3,1],["vol",4,1],["vol",5,1],["vol",6,1],["vol",7,1],["vol",8,1],["vol",9,1],["vol",10,1],["vol",11,1],["vol",12,1],["vol",13,1],["vol",14,1],["vol",15,1],["vol",16,1],["vol",17,1],["vol",18,1],["vol",19,1],["vol",20,1],["vol",21,1],["vol",22,1],["vol",23,1],["vol",24,1],["vol",25,1],["vol",26,1],["vol",27,1],["vol",28,1],["vol",29,1],["vol",30,1],["vol",31,1],["vol",32,1],["vol",33,1],["vol",34,1],["vol",35,1],["vol",36,1],["vol",37,1],["vol",38,1],["vol",39,1],["vol",40,1],["vol",41,1],["vol",42,1],["vol",43,1],["vol",44,1],["vol",45,2],["vol",46,2],["vol",47,2],["vol",48,2],["vol",49,2],["vol",50,2],["vol",51,2],["vol",52,2],["vol",53,2],["vol",54,2],["vol",55,2],["vol",56,2],["vol",57,2],["vol",58,2],["vol",59,2],["vol",60,2],["vol",61,2],["vol",62,2],["unassigned",0,1],["unassigned",1,1],["unassigned",2,1]]
+OPERATIONS = [["raw",0,3],["raw",1,3],["raw",2,3],["raw",3,3],["raw",4,3],["raw",5,3],["raw",6,3],["raw",7,3],["raw",8,3],["raw",9,3],["raw",10,3],["raw",11,3],["raw",12,3],["raw",13,3],["raw",14,3],["raw",15,3],["raw",16,3],["raw",17,3],["raw",18,3],["raw",19,3],["raw",20,3],["raw",21,3],["copy_prev",0,0],["copy_vert_fwd",0,0],["copy_vert",0,0],["copy_vert_back",0,0],["hash_table",0,1],["repeat_op",0,3],["vol",0,1],["vol",1,1],["vol",2,1],["vol",3,1],["vol",4,1],["vol",5,1],["vol",6,1],["vol",7,1],["vol",8,1],["vol",9,1],["vol",10,1],["vol",11,1],["vol",12,1],["vol",13,1],["vol",14,1],["vol",15,1],["vol",16,1],["vol",17,1],["vol",18,1],["vol",19,1],["vol",20,1],["vol",21,1],["vol",22,1],["vol",23,1],["vol",24,1],["vol",25,1],["vol",26,1],["vol",27,1],["vol",28,1],["vol",29,1],["vol",30,1],["vol",31,1],["vol",32,1],["vol",33,1],["vol",34,1],["vol",35,1],["vol",36,1],["vol",37,1],["vol",38,1],["vol",39,1],["vol",40,1],["vol",41,1],["vol",42,1],["vol",43,1],["vol",44,1],["vol",45,2],["vol",46,2],["vol",47,2],["vol",48,2],["vol",49,2],["vol",50,2],["vol",51,2],["vol",52,2],["vol",53,2],["vol",54,2],["vol",55,2],["vol",56,2],["vol",57,2],["vol",58,2],["vol",59,2],["vol",60,2],["vol",61,2],["vol",62,2],["unassigned",0,0],["unassigned",1,0],["unassigned",2,0]]
 
 OP_INDICES = {(op_data[0],op_data[1]):(i,op_data[2]) for i, op_data in enumerate(OPERATIONS)}
 
@@ -66,45 +66,38 @@ def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
     
     for col in image_array:
         col = limit_RGB(col)  
-        col_diff = (col[0]-col_prev[0][0], col[1]-col_prev[0][1], col[2]-col_prev[0][2])
 
         # find chunk to encode with:
-        if is_similar(col, col_prev[0], lossy_tolerance):
+        if is_similar(col, (c:=col_prev[0]), lossy_tolerance):
             chunks.append((('copy_prev',0), ()))
-            col = col_prev[0]
-            _add_colour(col)
+            _add_colour(c)
             continue
 
-        if is_similar(col, col_prev[dimensions[0]-1], lossy_tolerance):
+        if is_similar(col, (c:=col_prev[dimensions[0]-2]), lossy_tolerance):
             chunks.append((('copy_vert_fwd',0), ()))
-            col = col_prev[dimensions[0]-1]
-            _add_colour(col)
+            _add_colour(c)
             continue
         
-        if is_similar(col, col_prev[dimensions[0]], lossy_tolerance):
+        if is_similar(col, (c:=col_prev[dimensions[0]-1]), lossy_tolerance):
             chunks.append((('copy_vert',0), ()))
-            col = col_prev[dimensions[0]]
-            _add_colour(col)
+            _add_colour(c)
             continue
 
-        if is_similar(col, col_prev[dimensions[0]+1], lossy_tolerance):
+        if is_similar(col, (c:=col_prev[dimensions[0]+0]), lossy_tolerance):
             chunks.append((('copy_vert_back',0), ()))
-            col = col_prev[dimensions[0]+1]
-            _add_colour(col)
+            _add_colour(c)
             continue
         
-        si = similar_in_list(col_table, col, lossy_tolerance)
-        if si is not None:
+        if (si := similar_in_list(col_table, col, lossy_tolerance)) is not None:
             chunks.append((('hash_table',0), (si,)))
-            col = col_table[si]
-            _add_colour(col)
+            _add_colour(col_table[si])
             continue
         
         in_volume = False
+        col_diff = (col[0]-col_prev[0][0], col[1]-col_prev[0][1], col[2]-col_prev[0][2])
         YUV_diff = RGB_to_YUV(col_diff)
         for i, volume in enumerate(VOLUMES):
-            index = lu.col_to_vol_index(YUV_diff, volume[0], volume[1])
-            if index is not None:
+            if (index := lu.col_to_vol_index(YUV_diff, volume[0], volume[1])) is not None:
 
                 if volume[2] == 1:
                     chunks.append((('vol',i), (index,)))
@@ -212,13 +205,13 @@ def decompress(stream:str, dimensions:tuple, debug=False):
                 _add_colour(col_prev[0], op_name)
 
             case 'copy_vert_fwd':
-                _add_colour(col_prev[dimensions[0] - 1], op_name)
+                _add_colour(col_prev[dimensions[0] - 2], op_name)
 
             case 'copy_vert':
-                _add_colour(col_prev[dimensions[0]], op_name)
+                _add_colour(col_prev[dimensions[0] - 1], op_name)
 
             case 'copy_vert_back':
-                _add_colour(col_prev[dimensions[0] + 1], op_name)
+                _add_colour(col_prev[dimensions[0] + 0], op_name)
 
             case 'hash_table':
                 _add_colour(col_table[op_data[0]], op_name)

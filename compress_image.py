@@ -51,14 +51,14 @@ def decompress_img(image_name, path=''):
 
 if __name__ == '__main__':
 
-    compress_img('images/beach.png')
+    #compress_img('images/beach.png')
     #compress_img('images/test.png')
     #compress_img('images/grad.png', lossy_tolerance=20)
     #compress_img('images/region_landing_pad_night.png', lossy_tolerance=20)
     #compress_img('images/boat.png', lossy_tolerance=1)
     #compress_img('images/testcard.png')
     #compress_img('images/breakable_atlas.png')
-    #compress_img('images/nprguy.jpg')
+    compress_img('images/nprguy.jpg')
     #compress_img('images/region_pod.png')
     #compress_img('images/alltrue_mc_textures.png')
     
