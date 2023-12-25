@@ -1,7 +1,16 @@
 ﻿.vscode/*
 !.vscode/launch.json
 
-compressed.txt
 __pycache__
-A8_decompress_chunks.json
-RGB8_decompress_chunks.json
+
+# data files used for debugging
+debug/*
+
+# default location to output data
+output/*
+
+# Rhino backup
+*.3dmbak
+
+# Rhino lock file
+*.3dm.rhl
