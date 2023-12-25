@@ -42,7 +42,7 @@ Run-length encoding is handled as a 2nd pass in the encoder. Its goal is to redu
 # A8
 *Generic single-channel 8-bit data*
 Example use case: transparency
-(WIP)
+(WIP, not in a usable state yet)
 
 ## Chunks
 Index:
@@ -60,7 +60,9 @@ Size:
 - raw value: 1
 
 ### Raw Value
-With 22 operations, each with 3 data characters, a mixed-base number (a₂₂,b₉₄,c₉₄,d₉₄) can be represented (internally referred to as a "4-tuple"). This can contain all 16,777,216 8-bit per channel RGB colours. 
+There are 256 values that need to be encoded and these can fit in to 3 operations with 1 data char each. 
+
+raw0 handles 0-93, raw1 handles 94-187, raw2 handles 188-255.
 
 ### Copy Adjacent Colour
 Copy previous, vertical-forward, vertical, vertical-back.
@@ -68,3 +70,5 @@ Copy previous, vertical-forward, vertical, vertical-back.
 ### Difference
 If a value is similar to the previous, it can be encoded as a difference from it. Differences from 1 to 43 and -1 to -43 can be encoded as single operations. A difference of 0 is handled by the copy_prev operation. Differences can wrap. For example, 254 -> 3 can be handled as a difference of -251 or it can be better handled as -5 which can be encoded as it is in the range.
 
+### RLE
+Not implemented.
