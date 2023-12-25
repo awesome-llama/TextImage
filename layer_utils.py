@@ -71,20 +71,48 @@ def ftup_to_col(ftup: tuple):
 
 
 def analyse_chunks(chunks: list):
-
+    """Analyse chunks to find occurences of operations for an understanding of compression effectiveness."""
     analysis = {}
     for chunk_name, chunk_data in chunks:
         if chunk_name in analysis:
             analysis[chunk_name] += 1
         else:
             analysis[chunk_name] = 1
-    print(analysis)
+    #print(analysis)
 
     ordered_analysis = [(f'{a[0]}{a[1]}',b) for a,b in analysis.items()]
     ordered_analysis.sort(key=lambda x: x[1], reverse=True)
     ordered_analysis_dict = {a:b for a,b in ordered_analysis}
     print(ordered_analysis_dict)
     return ordered_analysis_dict
+
+
+# WIP:
+def create_layer(purpose:str, stream_type:str, version:str, stream:str):
+
+    return f'p:{purpose},t:{stream_type},v:{version},l:{len(stream)},s:{stream}'
+
+
+def read_layer(layer: str):
+    attrs = {}
+    
+    key = None
+    substring = ''
+    for i in range(len(layer)):
+        if layer[i] == ':':
+            key = substring
+            if key == 's': # stream starts here
+                attrs['s'] = layer[i:] 
+                return attrs
+
+            substring = ''
+        elif layer[i] == ',':
+            attrs[key] = substring
+            substring = ''
+        else:
+            substring = substring + layer[i]
+    
+    return attrs
 
 
 if __name__ == '__main__':

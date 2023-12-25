@@ -41,8 +41,6 @@ def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
     
     for col in image_array:
         col = limit_A(col)
-        diff = (((col-col_prev[0])+128)%256-128) # this is wrong, needs to take into account wrapping of col
-        print(col_prev[0], col, diff)
 
         # find chunk to encode with:
         if is_similar(col, (c:=col_prev[0]), lossy_tolerance):
@@ -65,6 +63,7 @@ def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
             _add_val(c)
             continue
         
+        diff = (((col-col_prev[0])+128)%256-128)
         
         if 0 < diff < 42:
             chunks.append((('inc',diff-1), ()))
@@ -78,29 +77,32 @@ def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
         
         # raw pixel, do not compress
         if col >= 94*2:
-            chunks.append((('raw', 2), (col-(94*2))))
+            chunks.append((('raw', 2), (col-(94*2),)))
         elif col >= 94:
-            chunks.append((('raw', 1), (col-(94))))
+            chunks.append((('raw', 1), (col-(94),)))
         else:
-            chunks.append((('raw', 0), (col)))
+            chunks.append((('raw', 0), (col,)))
         _add_val(col)
 
     return chunks
 
 
 
-def compress(image_array:list, dimensions:tuple, lossy_tolerance=0):
+def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, debug=False):
     """Compress generic 8 bit per channel data stream (e.g. alpha)"""
 
     chunks = data_stream_to_chunks(image_array, dimensions, lossy_tolerance) # get a list of chunks
-    #chunks = chunk_RLE(chunks) # second pass for RLE
+    #if RLE: chunks = chunk_RLE(chunks) # second pass for RLE
 
+    if debug:
+        lu.analyse_chunks(chunks)
+        with open('debug/A8_compress_chunks.json', 'w') as f:
+            f.write(json.dumps(chunks, indent=2))
 
     # final pass to convert chunks into strings:
     string_chunks = []
     for chunk_name, chunk_data in chunks:
         string_chunks.append(lu.index_to_txt(get_op_index(chunk_name)) + lu.index_to_txt(chunk_data))
-
 
     return ''.join(string_chunks)
 
@@ -168,7 +170,7 @@ def decompress(stream:str, dimensions:tuple, debug=False):
         i += 1
 
     if debug:
-        with open('A8_decompress_chunks.json', 'w') as f:
+        with open('debug/A8_decompress_chunks.json', 'w') as f:
             f.write(json.dumps(chunks, indent=2))
     
     # read intermediate and emit pixels into output list
@@ -188,7 +190,7 @@ def decompress(stream:str, dimensions:tuple, debug=False):
         else: _process_op(chunk_name, chunk_data)
 
     if debug:
-        with open('A_decompress_image_array.json', 'w') as f:
+        with open('debug/A8_decompress_image_array.json', 'w') as f:
             f.write(json.dumps(image_array, indent=2))
 
     return image_array
@@ -197,13 +199,13 @@ def decompress(stream:str, dimensions:tuple, debug=False):
 
 
 if __name__ == '__main__':
-    #img_test = [0,25,122,256,0,122]
-    img_test = [2,3,0,5,10,250]
-    #print(data_stream_to_chunks(img_test, (3,2)))
-
-    temp = compress(img_test, (3,2))
-    print(temp)
-
-    print(decompress(temp, (3,2), False))
+    #img_data, img_dimensions = [128, 1, 19, 20], (2,2)
+    #img_data, img_dimensions = [0,25,122,256,0,122], (3,2)
+    img_data, img_dimensions = [2,3,0,5,10,250,99,45,44,0], (5, 2)
+    print(img_data, img_dimensions)
+    datastream = compress(img_data, img_dimensions, RLE=False, debug=True)
+    print(datastream)
+    decompressed_img = decompress(datastream, img_dimensions, debug=True)
+    print(decompressed_img, img_data == decompressed_img)
 
 

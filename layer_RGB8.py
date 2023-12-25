@@ -165,7 +165,7 @@ def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, de
 
     if debug:
         lu.analyse_chunks(chunks)
-        with open('RGB8_compress_chunks.json', 'w') as f:
+        with open('debug/RGB8_compress_chunks.json', 'w') as f:
             f.write(json.dumps(chunks, indent=2))
 
     # final pass to convert chunks into strings:
@@ -257,7 +257,7 @@ def decompress(stream:str, dimensions:tuple, debug=False):
         i += 1
 
     if debug:
-        with open('RGB8_decompress_chunks.json', 'w') as f:
+        with open('debug/RGB8_decompress_chunks.json', 'w') as f:
             f.write(json.dumps(chunks, indent=2))
     
     # read intermediate and emit pixels into output list
@@ -278,7 +278,7 @@ def decompress(stream:str, dimensions:tuple, debug=False):
         else: _process_op(chunk_name, chunk_data)
 
     if debug:
-        with open('RGB8_decompress_image_array.json', 'w') as f:
+        with open('debug/RGB8_decompress_image_array.json', 'w') as f:
             f.write(json.dumps(image_array, indent=2))
 
     return image_array
