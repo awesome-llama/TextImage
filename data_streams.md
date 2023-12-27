@@ -1,8 +1,10 @@
 Data streams consist of "chunks". Each chunk contains an operation where the first character is the "op code" (op is short for operation). All characters after are "op data". The op codes are indexed from 0. Each op code has a defined size, except for RLE which specifies it as part of its data. The size only counts the op data. The encoder prioritises smaller operations to get the best compression.
 
+Refer to [ops.xlsx](ops.xlsx) for tables of all operations.
+
 # RGB8
 *RGB data, 8 bits per channel*
-*(although could accept any 3-channel 8-bit data, just note that the compression expects luma differences to be significant)*
+*(although could accept any 3-channel 8-bit data, note that the compression expects minimal luma differences to be common like in photos)*
 
 The compression used here outperforms both QOI and PNG images (when they are represented as base 64). As far as I'm aware, this is the best image compression available for Scratch. 
 
