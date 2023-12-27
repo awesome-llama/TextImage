@@ -87,32 +87,9 @@ def analyse_chunks(chunks: list):
     return ordered_analysis_dict
 
 
-# WIP:
-def create_layer(purpose:str, stream_type:str, version:str, stream:str):
-
-    return f'p:{purpose},t:{stream_type},v:{version},l:{len(stream)},s:{stream}'
-
-
-def read_layer(layer: str):
-    attrs = {}
-    
-    key = None
-    substring = ''
-    for i in range(len(layer)):
-        if layer[i] == ':':
-            key = substring
-            if key == 's': # stream starts here
-                attrs['s'] = layer[i:] 
-                return attrs
-
-            substring = ''
-        elif layer[i] == ',':
-            attrs[key] = substring
-            substring = ''
-        else:
-            substring = substring + layer[i]
-    
-    return attrs
+def properties(purpose:str, stream_type:str, version:str, stream:str):
+    """Create properties for a data stream."""
+    return [str(purpose), str(stream_type), str(version), str(len(stream))]
 
 
 if __name__ == '__main__':
