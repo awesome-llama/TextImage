@@ -9,22 +9,15 @@ Refer to [ops.xlsx](ops.xlsx) for tables of all operations.
 The compression used here outperforms both QOI and PNG images (when they are represented as base 64). As far as I'm aware, this is the best image compression available for Scratch. 
 
 ## Chunks
-Index:
-- raw RGB value (0-21)
-- copy adjacent colour (22-25)
-- index into a hash table like QOI (26)
-- run-length encoding (RLE) of op codes (27)
-- luma difference volumes, size 1 (28-72)
-- luma difference volumes, size 2 (73-90)
-- unassigned (91-93)
-
-Size:
-- copy adjacent colour: 0
-- index into a hash table: 1
-- luma difference, size 1: 1
-- luma difference, size 2: 2
-- RLE: 2 or more
-- raw RGB value: 3
+Name | Index | Size
+--- | --- | ---
+raw RGB value | 0-21 | 3
+copy adjacent colour | 22-25 | 0
+index into a hash table like QOI | 26 | 1
+run-length encoding (RLE) of op codes | 27 | 2 or more
+luma difference volumes, size 1 | 28-72 | 1
+luma difference volumes, size 2 | 73-90 | 1
+unassigned | 91-93 | N/A
 
 ### Raw RGB Value
 With 22 operations, each with 3 data characters, a mixed-base number (a₂₂,b₉₄,c₉₄,d₉₄) can be represented (internally referred to as a "4-tuple"). This can contain all 16,777,216 8-bit per channel RGB colours. 
@@ -47,19 +40,13 @@ Example use case: transparency
 (WIP, not in a usable state yet)
 
 ## Chunks
-Index:
-- raw value (0-2)
-- copy adjacent colour (3-6)
-- run-length encoding (RLE) of op codes (7)
-- increasing difference (8-50)
-- decreasing difference (51-93)
-
-Size:
-- copy adjacent colour: 0
-- increasing difference: 0
-- decreasing difference: 0
-- RLE: 2 or more
-- raw value: 1
+Name | Index | Size
+--- | --- | ---
+raw value | 0-2 | 1
+copy adjacent colour | 3-6 | 0
+run-length encoding (RLE) of op codes | 7 | 2 or more
+increasing difference | 8-50 | 0
+decreasing difference | 51-93 | 0
 
 ### Raw Value
 There are 256 values that need to be encoded and these can fit in to 3 operations with 1 data char each. 
