@@ -33,7 +33,7 @@ The image format begins with magic number `img` (WIP, not finalised). This follo
 - image height `y` in pixels
 - list of data stream properties `p` containing 4 alternating property values. First value indicates the total number of items in the list. The following properties are (in this order): 
     - purpose within the image (`main`, `alpha`, etc.)
-    - data stream name (`RGB8`, `A8`, etc.)
+    - data stream type (`RGB8`, `A8`, etc.)
     - data stream version (`0` for all data streams currently)
     - data stream length (number of characters in the data stream by itself)
 
