@@ -3,46 +3,8 @@
 
 from PIL import Image
 import numpy as np
-import layer_utils as lu
 import layer_A8
 import layer_RGB8
-
-
-def compress_img(image_path, output_path='output/', mode='RGBA', debug=False):
-    """Open an image and compress it. Save."""
-    # TODO: choose where to load and save, specify colour mode, compression, debug
-    
-    image = Image.open(image_path)
-
-    file = [
-        'img', 
-        'v:0', 
-        f'x:{image.width}',
-        f'y:{image.height}',
-        ]
-
-    data_streams_props = [] # list of properties
-    data_streams = [] # the actual data streams
-    
-    if mode == 'RGBA' or mode == 'RGB':
-        
-        image = image.convert('RGB') # TODO detect alpha
-        image_array = np.asarray(image)
-        image_array = np.flip(image_array, 0)
-        image_array = np.reshape(image_array, (image.width*image.height, 3), 'A')
-        
-        ds = layer_RGB8.compress(image_array, image.size, debug=debug)
-        data_streams.append(ds)
-        data_streams_props.extend(lu.properties('main', 'RGB8', 0, ds))
-    
-    # concatenate everything into a single string...
-    file.append(f'p:{len(data_streams_props)},{",".join(data_streams_props)}')
-    file = ",".join(file)
-    file = file + '|' + "".join(data_streams)
-
-    # save file
-    with open(output_path + 'compressed.txt', 'w') as f:
-        f.write(file)
 
 
 class TextImage:
@@ -111,29 +73,32 @@ class TextImage:
 def from_image_file(path, debug=False):
     """Load an image file and return a text image object"""
 
+    def asarray(image, size: tuple, channels: int = 1):
+        """Convert pillow object into flattened array"""
+        arr = np.asarray(image)
+        arr = np.flip(arr, 0)
+        arr = np.reshape(arr, (size[0]*size[1], channels), 'A')
+        return arr
+    
     image = Image.open(path)
     txtimg = TextImage(image.size)
 
-    im = image.convert('RGB')
-    image_array = np.asarray(im)
-    image_array = np.flip(image_array, 0)
-    image_array = np.reshape(image_array, (image.width*image.height, 3), 'A')
+    # RGB main
+    image_array = asarray(image.convert('RGB'), image.size, 3)
     ds = layer_RGB8.compress(image_array, image.size, debug=debug)
     txtimg.add_layer(ds, 'main', 'RGB8', '0')
 
+    # alpha channel
     if image.mode == 'RGBA':
-        alpha = image.split()[-1]
-        image_array = np.asarray(alpha)
-        image_array = np.flip(image_array, 0)
-        image_array = np.reshape(image_array, (image.width*image.height, 1), 'A')
+        image_array = asarray(image.split()[-1], image.size, 1)
         ds = layer_A8.compress(image_array, image.size, debug=debug)
         txtimg.add_layer(ds, 'alpha', 'A8', '0')
 
     return txtimg
 
+
 if __name__ == '__main__':
     print('compress')
-    #compress_img('images/beach_15x9.png')
-
     img = from_image_file('images/alphagrad.png', False)
     img.save('output/compressed2.txt')
+

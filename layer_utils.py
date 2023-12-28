@@ -87,10 +87,6 @@ def analyse_chunks(chunks: list):
     return ordered_analysis_dict
 
 
-def properties(purpose:str, stream_type:str, version:str, stream:str):
-    """Create properties for a data stream."""
-    return [str(purpose), str(stream_type), str(version), str(len(stream))]
-
 
 if __name__ == '__main__':
     print(index_to_txt(0))

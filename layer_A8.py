@@ -104,6 +104,12 @@ def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, de
     for chunk_name, chunk_data in chunks:
         string_chunks.append(lu.index_to_txt(get_op_index(chunk_name)) + lu.index_to_txt(chunk_data))
 
+    if debug:
+        size_pixels = dimensions[0]*dimensions[1]
+        size_compressed = len(''.join(string_chunks))
+        print('b64:' , 2*size_pixels, '-> compressed:' , size_compressed)
+        print(f'{round(100*size_compressed/(2*size_pixels), 2)}% of original')
+    
     return ''.join(string_chunks)
 
 
