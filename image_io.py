@@ -66,11 +66,39 @@ class TextImage:
         with open(path, 'w') as f:
             f.write(self.text())
 
-    def to_pillow_image(self):
+    def to_pillow_image(self, main_layer='main', alpha_layer=None, debug=False):
         """Return a Pillow image object"""
-        image = Image.new('RGB', size=self.size)
 
-        # TODO
+        # get main:
+        if main_layer not in self.layers:
+            raise Exception('main layer not found')
+        
+        if self.layers[main_layer]['type'] == 'RGB8':
+            main_array = layer_RGB8.decompress(self.layers[main_layer]['data_stream'], self.size, debug=debug)
+            main_array = np.array(main_array, np.uint8)
+            main_array = np.flip(main_array.reshape(self.size[1], self.size[0], 3), 0)
+        #elif self.layers[main_layer]['type'] == 'A8':
+        #    main_array = layer_A8.decompress(self.layers[main_layer]['data_stream'], self.size, debug=debug)
+        else: raise Exception('Layer type unknown for main')
+        
+        
+        if alpha_layer is not None:
+            # get alpha
+            if alpha_layer in self.layers:
+                if self.layers[alpha_layer]['type'] != 'A8':
+                    raise Exception('alpha layer must be single channel')
+                
+                alpha_array = layer_A8.decompress(self.layers[alpha_layer]['data_stream'], self.size, debug=debug)
+                alpha_array = np.array(alpha_array, np.uint8)
+                alpha_array = np.flip(alpha_array.reshape(self.size[1], self.size[0], 1), 0)
+                
+            else: raise Exception('alpha layer not found')
+            
+            image = Image.fromarray(obj=np.concatenate((main_array, alpha_array), axis=-1), mode='RGBA')
+
+        else:
+            # no alpha
+            image = Image.fromarray(obj=main_array, mode='RGB')
 
         return image
 
@@ -150,13 +178,22 @@ def split_by_lengths(data, lengths:list):
     
 
 if __name__ == '__main__':
-    #print('compress')
-    #txtimg = load_from_image_file('images/alphagrad.png', False)
-    #txtimg.save('output/compressed2.txt')
-
-    print('decompress')
-    txtimg = load_from_text('output/compressed2.txt')
-    img = txtimg.to_pillow_image()
+    PATH = 'images/alphagrad.png'
+    #PATH = 'C:/Users/Atlas/Documents/Scratch/Image Format 2/all images/alltrue_mc_textures.png'
+    
+    print('COMPRESS')
+    txtimg = load_from_image_file(PATH, False)
     print(txtimg)
+    txtimg.save('output/compressed2.txt')
+
+    print('')
+
+    print('DECOMPRESS')
+    txtimg = load_from_text('output/compressed2.txt')
+    print(txtimg)
+    img = txtimg.to_pillow_image(alpha_layer='alpha')
+    print(img)
+    img.show()
+    img.save('output/decompressed.png')
 
     #print(split_by_lengths('abcdefgh', [2, 3, 2, 1]))
