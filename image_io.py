@@ -1,5 +1,4 @@
-# save and load images
-# TODO add functions here, replace compress_image.py
+# Save and load images
 
 from PIL import Image
 import numpy as np
@@ -77,8 +76,11 @@ class TextImage:
             main_array = layer_RGB8.decompress(self.layers[main_layer]['data_stream'], self.size, debug=debug)
             main_array = np.array(main_array, np.uint8)
             main_array = np.flip(main_array.reshape(self.size[1], self.size[0], 3), 0)
-        #elif self.layers[main_layer]['type'] == 'A8':
-        #    main_array = layer_A8.decompress(self.layers[main_layer]['data_stream'], self.size, debug=debug)
+        elif self.layers[main_layer]['type'] == 'A8':
+            main_array = layer_A8.decompress(self.layers[main_layer]['data_stream'], self.size, debug=debug)
+            main_array = np.array(main_array, np.uint8)
+            main_array = np.repeat(main_array, 3)
+            main_array = np.flip(main_array.reshape(self.size[1], self.size[0], 3), 0)
         else: raise Exception('Layer type unknown for main')
         
         
@@ -197,3 +199,17 @@ if __name__ == '__main__':
     img.save('output/decompressed.png')
 
     #print(split_by_lengths('abcdefgh', [2, 3, 2, 1]))
+
+    # test: main channel to A8
+    """txtimg = load_from_image_file('images/rhodes_transparent.png')
+    txtimg.layers['main'] = txtimg.layers['alpha']
+    txtimg.layers.pop('alpha')
+
+    txtimg.save('output/compressed2.txt')
+
+    txtimg = load_from_text('output/compressed2.txt')
+    print(txtimg)
+    img = txtimg.to_pillow_image()
+    print(img)
+    img.show()
+    img.save('output/decompressed.png')"""
