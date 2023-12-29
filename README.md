@@ -16,7 +16,7 @@ The goals of this image format are:
 
 
 ## Format Outline
-**WARNING: NOT IMPLEMENTED OR FINALISED**
+**WARNING: NOT FINALISED**
 
 This format stores images as printable text using 94 of the 95 printable ASCII characters. The one character excluded is space.
 
@@ -26,7 +26,7 @@ The full ordered set of characters in use, indexed 0-93:
 
 An arbitrary number of "data streams" can be specified. Each data stream has corresponding properties to specify their type and usage. This enables easy expansion to support new methods beyond the 8-bit RGB and 8-bit generic lossless data streams currently implemented.
 
-The image format begins with magic number `img` (WIP, not finalised). This follows with a comma and then these key-value pairs separated by commas. Semicolons go in between the key name and value. Identical implementation to [my save code format](https://awesome-llama.github.io/articles/my-save-code-format).
+The image format begins with magic number `txtimg`. This follows with a comma and then these key-value pairs separated by commas. Semicolons go between the key name and value. Identical implementation to [my save code format](https://awesome-llama.github.io/articles/my-save-code-format).
 
 - version number `v` (currently `0`)
 - image width `x` in pixels 
@@ -41,7 +41,7 @@ A bar (`|`) then indicates the data streams follow, which are all concatenated w
 
 An example image looks like this (with the data stream removed):
 
-```img,v:0,x:120,y:80,p:8,main,RGB8,0,22682,alpha,A8,0,523|```
+```txtimg,v:0,x:120,y:80,p:8,main,RGB8,0,22682,alpha,A8,0,523|```
 
 This example is a 120x80 image with 8 bit RGB and alpha channels. The RGB8 data stream is 22682 characters long whereas the alpha channel is 523 characters.
 

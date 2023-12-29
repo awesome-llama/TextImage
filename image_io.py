@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import layer_A8
 import layer_RGB8
-
+import cskv_utils as cskv
 
 class TextImage:
     def __init__(self, size: tuple):
@@ -14,9 +14,12 @@ class TextImage:
         self.magic_num = 'txtimg'
         self.version = '0'
         
-        self.size: tuple = size # 2-tuple for width and height
+        self.size: tuple = (max(0, int(size[0])), max(0, int(size[1]))) # 2-tuple for width and height
         self.layers: list = [] # a list containing all the layers (properties and data stream)
         self.custom_attributes = {} # for the user to store additional data
+
+    def __str__(self):
+        return f'TextImage v{self.version} {self.size[0]}x{self.size[1]} with {len(self.layers)} layers: {', '.join([l['purpose'] + ' using ' + l['type'] + '_v' + l['version'] for l in self.layers])}'
 
     def add_layer(self, data_stream, purpose='main', type='RGB8', version='0'):
         """Add a layer to the image"""
@@ -30,21 +33,22 @@ class TextImage:
     def text(self):
         """Get the image as text"""
         file = []
-        # essentials
-        file.append(str(self.magic_num))
-        file.append(f'v:{self.version}')
-        file.append(f'x:{self.size[0]}')
-        file.append(f'y:{self.size[1]}')
+
+        header = {
+            'v':self.version,
+            'x':self.size[0],
+            'y':self.size[1],
+            'p':[], # layer properties
+            }
 
         # custom attributes
         for k,v in self.custom_attributes.items():
-            file.append(f'{k}:{v}')
+            if k not in header: header[k] = v
         
         # layers
-        layer_props = [] # list of properties
         layer_data_streams = [] # the actual data streams
         for l in self.layers:
-            layer_props.extend([
+            header['p'].extend([
                 str(l['purpose']),
                 str(l['type']),
                 str(l['version']),
@@ -52,10 +56,9 @@ class TextImage:
             ])
             layer_data_streams.append(l['data_stream'])
         
-        file.append(f'p:{len(layer_props)},{','.join(layer_props)}')
-        
         # concatenate everything into a single string...
-        file = ','.join(file) + '|' + ''.join(layer_data_streams)
+        file = cskv.CSKV_write(header, magic_number=self.magic_num, append_comma=False)
+        file = file + '|' + ''.join(layer_data_streams)
 
         return file
 
@@ -67,10 +70,13 @@ class TextImage:
     def to_pillow_image(self):
         """Return a Pillow image object"""
         image = Image.new('RGB', size=self.size)
+
+        # TODO
+
         return image
 
 
-def from_image_file(path, debug=False):
+def load_from_image_file(path, debug=False):
     """Load an image file and return a text image object"""
 
     def asarray(image, size: tuple, channels: int = 1):
@@ -97,8 +103,61 @@ def from_image_file(path, debug=False):
     return txtimg
 
 
-if __name__ == '__main__':
-    print('compress')
-    img = from_image_file('images/alphagrad.png', False)
-    img.save('output/compressed2.txt')
+def load_from_text(path):
+    """Load a text image from file, return TextImage object"""
 
+    with open(path, 'r') as f:
+        file: str = f.read()
+
+    header, layer_data_streams = file.split('|', 1) # split at first bar character
+    
+    # read header
+    header = cskv.CSKV_read(header, remove_end_comma=False)
+
+    # format validity
+    if header[None] != 'txtimg': raise Exception('Unknown magic number')
+    if header['v'] != '0': raise Exception('Incompatible version number, expected 0')
+    if int(header['p'][0])+1 != len(header['p']): raise Exception('layer properties invalid length')
+    
+    header['p'].pop(0)
+
+    txtimg = TextImage((header['x'], header['y']))
+    txtimg.version = header['v']
+
+    # reformat layers
+    layer_properties = []
+    lengths = []
+    for i in range(0, len(header['p']), 4):
+        layer_properties.append(header['p'][i:i+3])
+        lengths.append(int(header['p'][i+3]))
+    layer_data_streams = split_by_lengths(layer_data_streams, lengths)
+    
+    # add all the layers to the object
+    for p,ds in zip(layer_properties, layer_data_streams):
+        txtimg.add_layer(ds, p[0], p[1], p[2]) 
+
+    return txtimg
+    
+def split_by_lengths(data, lengths:list):
+    """Split indexable data by a list of desired resulting lengths."""
+    result = []
+    start = 0
+    for length in lengths:
+        result.append(data[start:start+length])
+        start += length
+
+    return result
+
+    
+
+if __name__ == '__main__':
+    #print('compress')
+    #txtimg = load_from_image_file('images/alphagrad.png', False)
+    #txtimg.save('output/compressed2.txt')
+
+    print('decompress')
+    txtimg = load_from_text('output/compressed2.txt')
+    img = txtimg.to_pillow_image()
+    print(txtimg)
+
+    #print(split_by_lengths('abcdefgh', [2, 3, 2, 1]))
