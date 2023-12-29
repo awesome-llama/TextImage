@@ -14,21 +14,20 @@ class TextImage:
         self.magic_num = 'txtimg'
         self.version = '0'
         
-        self.size: tuple = (max(0, int(size[0])), max(0, int(size[1]))) # 2-tuple for width and height
-        self.layers: list = [] # a list containing all the layers (properties and data stream)
+        self.size = (max(0, int(size[0])), max(0, int(size[1]))) # 2-tuple for width and height
+        self.layers = {} # dict containing all the layers (properties and data stream), key is purpose
         self.custom_attributes = {} # for the user to store additional data
 
     def __str__(self):
-        return f'TextImage v{self.version} {self.size[0]}x{self.size[1]} with {len(self.layers)} layers: {', '.join([l['purpose'] + ' using ' + l['type'] + '_v' + l['version'] for l in self.layers])}'
+        return f'TextImage v{self.version} {self.size[0]}x{self.size[1]} with {len(self.layers)} layers: {', '.join([k + ' using ' + l['type'] + '_v' + l['version'] for k,l in self.layers.items()])}'
 
     def add_layer(self, data_stream, purpose='main', type='RGB8', version='0'):
         """Add a layer to the image"""
-        self.layers.append({
-            'purpose':purpose,
+        self.layers[purpose] = {
             'type':type,
             'version':version,
             'data_stream':data_stream,
-        })
+        }
     
     def text(self):
         """Get the image as text"""
@@ -47,9 +46,9 @@ class TextImage:
         
         # layers
         layer_data_streams = [] # the actual data streams
-        for l in self.layers:
+        for k,l in self.layers.items():
             header['p'].extend([
-                str(l['purpose']),
+                str(k),
                 str(l['type']),
                 str(l['version']),
                 str(len(l['data_stream'])),
