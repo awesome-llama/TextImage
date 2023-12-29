@@ -14,3 +14,6 @@ output/*
 
 # Rhino lock file
 *.3dm.rhl
+
+# images converted to text and back
+images/converted/

@@ -13,9 +13,27 @@ def list_files(directory):
     
     return files
 
+# Create txtimg
+if True:
+    DIRECTORY = 'images/'
+    for file_name in list_files(DIRECTORY):
+        txtimg = image_io.load_from_image_file(DIRECTORY+file_name, debug=False)
+        print(txtimg)
+        txtimg.save(DIRECTORY+'converted/'+file_name+'.txt')
 
-DIRECTORY = 'images/'
 
-for file_name in list_files(DIRECTORY):
-    txtimg = image_io.load_from_image_file(DIRECTORY+file_name, debug=False)
-    txtimg.save(DIRECTORY+'converted/'+file_name+'.txt')
+# Convert back to image:
+if True:
+    DIRECTORY = 'images/converted/'
+    for file_name in list_files(DIRECTORY):
+        txtimg = image_io.load_from_text(DIRECTORY+file_name)
+        print(txtimg)
+        if 'alpha' in txtimg.layers:
+            image = txtimg.to_pillow_image(alpha_layer='alpha')
+        else:
+            image = txtimg.to_pillow_image()
+        
+        image.save(DIRECTORY+'to_image/'+file_name+'.png', format='png')
+
+
+

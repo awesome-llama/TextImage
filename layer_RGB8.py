@@ -120,48 +120,11 @@ def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
 
 
 
-def chunk_RLE(chunks):
-    chunks_RLE = []
-    buffer = [(None, ())]
-    buffer_op = buffer[0][0] # cache the first operation name
-
-    for chunk in chunks:
-        if chunk[0] == buffer_op and len(buffer) < 93: # match op in buffer
-            buffer.append(chunk)
-
-        else:
-            if buffer_op is not None:
-                buffer_size_chars = len(buffer) * (1 + get_op_size(buffer_op)) # (op, data)...
-                repeat_size_chars = 3 + len(buffer) * get_op_size(buffer_op) # op, op, repeat, (data)...
-            
-                if buffer_size_chars > repeat_size_chars:
-                    
-                    cd = [get_op_index(buffer_op), len(buffer)] # op and repeat count
-                    for elem in buffer:
-                        cd.extend(elem[1]) # append data for each buffer element
-                    
-                    cd = (('repeat_op',0), tuple(cd))
-
-                    assert repeat_size_chars == 1+len(cd[1]), 'mismatch in measurements for RLE'
-
-                    chunks_RLE.append(cd)
-                    
-                else:
-                    chunks_RLE.extend(buffer)
-                
-            buffer = [chunk]
-            buffer_op = buffer[0][0]
-
-    chunks_RLE.extend(buffer) # get anything still in the buffer
-
-    return chunks_RLE
-
-
 def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, debug=False):
     """Compress RGB 8 bit per channel data stream"""
 
     chunks = data_stream_to_chunks(image_array, dimensions, lossy_tolerance) # get a list of chunks
-    if RLE: chunks = chunk_RLE(chunks) # second pass for RLE
+    if RLE: chunks = lu.chunk_RLE(chunks, get_op_size, get_op_index) # second pass for RLE
 
     if debug:
         lu.analyse_chunks(chunks)

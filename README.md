@@ -1,4 +1,4 @@
-# Prototype Image Format 2
+# TextImage
 **Work in progress! Everything subject to change!**
 
 ## Motivations
@@ -25,7 +25,7 @@ The full ordered set of characters in use, indexed 0-93:
 
 An arbitrary number of "data streams" can be specified. Each data stream has corresponding properties to specify their type and usage. This enables easy expansion to support new methods beyond the 8-bit RGB and 8-bit generic lossless data streams currently implemented.
 
-The image format begins with magic number `txtimg`. This follows with a comma and then these key-value pairs separated by commas. Semicolons go between the key name and value. Identical implementation to [my save code format](https://awesome-llama.github.io/articles/my-save-code-format).
+The image format begins with magic number `txtimg`. This follows with a comma and then these key-value pairs separated by commas. Semicolons go between the key name and value. Identical implementation to [my save code format](https://awesome-llama.github.io/articles/my-save-code-format). This part of the format is known as `CSKV` or "comma-separated key-values".
 
 - version number `v` (currently `0`)
 - image width `x` in pixels 
@@ -36,7 +36,7 @@ The image format begins with magic number `txtimg`. This follows with a comma an
     - data stream version (`0` for all data streams currently)
     - data stream length (number of characters in the data stream by itself)
 
-A bar (`|`) then indicates the data streams follow, which are all concatenated without any separating character. 
+A vertical bar (`|`) then indicates the data streams follow, which are all concatenated without any separating character. 
 
 An example image looks like this (with the data stream removed):
 
@@ -52,7 +52,7 @@ Use of custom key names to store additional data is allowed however to avoid pot
 Pixels are ordered left-to-right (x axis), bottom-to-top (y axis).
 
 
-## Data Streams
+### Data Streams
 See [data_streams.md](data_streams.md).
 
 

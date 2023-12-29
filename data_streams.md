@@ -6,7 +6,7 @@ Refer to [ops.xlsx](ops.xlsx) for tables of all operations.
 *RGB data, 8 bits per channel*
 *(although could accept any 3-channel 8-bit data, note that the compression expects minimal luma differences to be common like in photos)*
 
-The compression used here outperforms both QOI and PNG images (when they are represented as base 64). As far as I'm aware, this is the best image compression available for Scratch. 
+The compression used here outperforms both QOI and PNG images in many cases (when they are represented as base 64). As far as I'm aware, this is the best image compression available for Scratch. 
 
 ## Chunks
 Name | Index | Size
@@ -33,11 +33,13 @@ All the volumes are positioned in Y'UV space to best cover the spread of possibl
 ### RLE
 Run-length encoding is handled as a 2nd pass in the encoder. Its goal is to reduce the number of repeating op codes (note: not op data). A single RLE operation consists of 2 fixed data characters, which is the operation it will repeat and then the number of times it will be repeated (0-93 times). This does mean it is possible to specify itself as the character to repeat but this is not implemented due to the complexity it would add.
 
+Uses the function `chunk_RLE()` in [layer_utils.py](layer_utils.py).
+
 
 # A8
 *Generic single-channel 8-bit data*
 Example use case: transparency
-(WIP, not in a usable state yet)
+The letter A has no meaning as it represents generic data.
 
 ## Chunks
 Name | Index | Size
@@ -60,4 +62,4 @@ Copy previous, vertical-forward, vertical, vertical-back.
 If a value is similar to the previous, it can be encoded as a difference from it. Differences from 1 to 43 and -1 to -43 can be encoded as single operations. A difference of 0 is handled by the copy_prev operation. Differences can wrap. For example, 254 -> 3 can be handled as a difference of -251 or it can be better handled as -5 which can be encoded as it is in the range.
 
 ### RLE
-Not implemented.
+Implemented identically to RGB8. 

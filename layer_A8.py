@@ -92,7 +92,7 @@ def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, de
     """Compress generic 8 bit per channel data stream (e.g. alpha)"""
 
     chunks = data_stream_to_chunks(image_array, dimensions, lossy_tolerance) # get a list of chunks
-    #if RLE: chunks = chunk_RLE(chunks) # second pass for RLE
+    if RLE: chunks = lu.chunk_RLE(chunks, get_op_size, get_op_index) # second pass for RLE
 
     if debug:
         lu.analyse_chunks(chunks)
@@ -207,11 +207,14 @@ def decompress(stream:str, dimensions:tuple, debug=False):
 if __name__ == '__main__':
     #img_data, img_dimensions = [128, 1, 19, 20], (2,2)
     #img_data, img_dimensions = [0,25,122,256,0,122], (3,2)
-    img_data, img_dimensions = [2,3,0,5,10,250,99,45,44,0], (5, 2)
+    img_data, img_dimensions = [2,3,0,5,10,250,99,45,44,0,4,4,4,4,4], (5, 2)
+    #img_data, img_dimensions = [2,3,0,5,10,250,99,45,44,0,4,4,4,4,4,3,3,1,0,255,254,253,252,251], (6,4)
+    #img_data, img_dimensions = [53,53,53,53,53,53,53,53,53,53,53,51], (6,2)
     print(img_data, img_dimensions)
-    datastream = compress(img_data, img_dimensions, RLE=False, debug=True)
+    datastream = compress(img_data, img_dimensions, debug=True)
     print(datastream)
     decompressed_img = decompress(datastream, img_dimensions, debug=True)
     print(decompressed_img, img_data == decompressed_img)
+    assert img_data == decompressed_img
 
 
