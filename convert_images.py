@@ -2,7 +2,7 @@
 
 import os
 import image_io
-
+from PIL import Image
 
 def list_files(directory):
     # get all files in the directory
@@ -17,7 +17,8 @@ def list_files(directory):
 if True:
     DIRECTORY = 'images/'
     for file_name in list_files(DIRECTORY):
-        txtimg = image_io.load_from_image_file(DIRECTORY+file_name, debug=False)
+        img = Image.open(DIRECTORY+file_name)
+        txtimg = image_io.load_from_pillow_image(img, debug=False)
         print(txtimg)
         txtimg.save(DIRECTORY+'converted/'+file_name+'.txt')
 

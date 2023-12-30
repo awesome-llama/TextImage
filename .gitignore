@@ -17,3 +17,9 @@ output/*
 
 # images converted to text and back
 images/converted/
+
+# Excel temp file
+~$ops.xlsx
+
+# test
+test.py

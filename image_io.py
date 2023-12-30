@@ -105,8 +105,8 @@ class TextImage:
         return image
 
 
-def load_from_image_file(path, debug=False):
-    """Load an image file and return a text image object"""
+def load_from_pillow_image(image, debug=False):
+    """Load an pillow image object and return a text image object"""
 
     def asarray(image, size: tuple, channels: int = 1):
         """Convert pillow object into flattened array"""
@@ -115,13 +115,17 @@ def load_from_image_file(path, debug=False):
         arr = np.reshape(arr, (size[0]*size[1], channels), 'A')
         return arr
     
-    image = Image.open(path)
     txtimg = TextImage(image.size)
 
     # RGB main
-    image_array = asarray(image.convert('RGB'), image.size, 3)
-    ds = layer_RGB8.compress(image_array, image.size, debug=debug)
-    txtimg.add_layer(ds, 'main', 'RGB8', '0')
+    if image.mode == 'L':
+        image_array = asarray(image, image.size, 1)
+        ds = layer_A8.compress(image_array, image.size, debug=debug)
+        txtimg.add_layer(ds, 'main', 'A8', '0')
+    else:
+        image_array = asarray(image.convert('RGB'), image.size, 3)
+        ds = layer_RGB8.compress(image_array, image.size, debug=debug)
+        txtimg.add_layer(ds, 'main', 'RGB8', '0')
 
     # alpha channel
     if image.mode == 'RGBA':
@@ -184,7 +188,8 @@ if __name__ == '__main__':
     #PATH = 'C:/Users/Atlas/Documents/Scratch/Image Format 2/all images/alltrue_mc_textures.png'
     
     print('COMPRESS')
-    txtimg = load_from_image_file(PATH, False)
+    img = Image.open(PATH)
+    txtimg = load_from_pillow_image(img, debug=False)
     print(txtimg)
     txtimg.save('output/compressed2.txt')
 
