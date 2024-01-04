@@ -3,17 +3,14 @@
 
 __pycache__
 
-# data files used for debugging
-debug/*
-
-# default location to output data
-output/*
-
 # Rhino backup
 *.3dmbak
 
 # Rhino lock file
 *.3dm.rhl
+
+# Rhino dump
+*.dmp
 
 # images converted to text and back
 images/converted/
