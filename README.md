@@ -1,21 +1,19 @@
 # TextImage
 
 ## Motivations
-The image format outlined here was necessitated by a lack of any decent way to store bitmap image data in Scratch. Scratch is limiting in that it cannot store binary data, only strings, bools, and double floats within variables and lists. Common image formats like PNG and JPEG are unusable without being represented as plain text. This has been done before, commonly using base 64 or hexadecimal but it's not optimal as there are many more characters available but no simple and efficient way to utilise them, and this still ignores the fact that binary image formats are difficult to read/write using the available features of Scratch. 
-
-Simpler representations of images exist too but are usually uncompressed. A common method is hexadecimal numbers concatenated together. It's fine for some use cases, but the lack of compression can become an issue. 
-
-See [this forum topic](https://scratch.mit.edu/discuss/topic/604786/) for more information. 
-
-The goals of this image format are:
-- at a minimum, support of 8-bit per channel RGB bitmap images
-- being representable as text without spaces
-- simple enough to implement in scratch (while also minimising the number of blocks and variables), enabling it to be more easily be used by others
-- offer significantly smaller file sizes compared to pre-existing methods using lossless compression
+The image format outlined here was necessitated by a lack of any decent way to store bitmap image data in Scratch. Scratch is limiting in that it cannot store binary data, only strings, booleans, and double floats within variables and lists. Common image formats like PNG and JPEG are unusable without being represented as plain text. This has been done before, commonly using base 64 or hexadecimal but it's not optimal as there are many more characters available but no simple and efficient way to utilise them, and this still ignores the fact that binary image formats are difficult to read/write using the available features of Scratch. Simpler representations of images are very common but are usually uncompressed, for example, hexadecimal numbers concatenated together. These are fine for many use cases but lack of compression and metadata can make them less usable for more complex projects.
 
 
 ## Format Outline
+- Supports an arbitrary number of colour channels including lossless 8-bit per channel RGB bitmap images and lossless 8-bit per channel generic (e.g. for alpha).
+- Uses printable ASCII characters only, no spaces and no newlines.
+- Simple enough to implement in scratch (while also minimising the number of blocks and variables), enabling it to be more easily be used by others.
+- Offers significantly smaller file sizes compared to pre-existing Scratch methods.
 
+[TextImage examples](images/converted)
+
+
+## Format Specifications
 This format stores images as printable text using 94 of the 95 printable ASCII characters. The one character excluded is space.
 
 The full ordered set of characters in use, indexed 0-93:
@@ -35,14 +33,13 @@ The image format begins with magic number `txtimg`. This follows with a comma an
     - data stream version (`0` for all data streams currently)
     - data stream length (number of characters in the data stream by itself)
 
-A vertical bar (`|`) then indicates the data streams follow, which are all concatenated without any separating character. 
+A vertical bar (`|`) then indicates the data streams will follow, which are all concatenated without any separating character. 
 
-An example image looks like this (with the data stream removed):
+An example image looks like this (with the concatenated data streams removed):
 
 ```txtimg,v:0,x:120,y:80,p:8,main,RGB8,0,22682,alpha,A8,0,523|```
 
 This example is a 120x80 image with 8 bit RGB and alpha channels. The RGB8 data stream is 22682 characters long whereas the alpha channel is 523 characters.
-
 
 Reserved characters due to their usage as separators: `,:|`
 
