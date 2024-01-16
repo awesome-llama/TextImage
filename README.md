@@ -54,13 +54,14 @@ See [data_streams.md](data_streams.md).
 
 ## Dependencies
 - Requires Pillow and numpy.
+- pyperclip is used in `quick_preview.py` but not required anywhere else.
 - Python 3.10 or newer.
 
 
 ## Usage
 Use the methods defined in [image_io.py](image_io.py). 
 
-An image can be stored as a `TextImage` object. To convert it to a Pillow Image object, use the method `to_pillow_image()` (and from there you can manipulate or save it). To create a TextImage object, use `load_from_pillow_image()` to load from a Pillow Image object or  `load_from_text()` to load from a saved TextImage text file. To save a TextImage object as a text file, use the `save()` method.
+An image can be stored as a `TextImage` object. To convert it to a Pillow Image object, use the method `to_pillow_image()` (and from there you can manipulate or save it). To create a TextImage object, use `load_from_pillow_image()` to load from a Pillow Image object or  `load_from_text_file()` to load from a saved TextImage text file. To save a TextImage object as a text file, use the `save()` method.
 
 
 ## Current Issues

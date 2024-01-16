@@ -65,7 +65,7 @@ class TextImage:
         with open(path, 'w') as f:
             f.write(self.text())
 
-    def to_pillow_image(self, main_layer='main', alpha_layer=None, debug=False):
+    def to_pillow_image(self, main_layer='main', alpha_layer='alpha', require_alpha=False, debug=False):
         """Return a Pillow image object"""
 
         # get main:
@@ -81,25 +81,24 @@ class TextImage:
             main_array = np.array(main_array, np.uint8)
             main_array = np.repeat(main_array, 3)
             main_array = np.flip(main_array.reshape(self.size[1], self.size[0], 3), 0)
-        else: raise Exception('Layer type unknown for main')
+        else: 
+            raise Exception('Layer type unknown for main')
         
-        
-        if alpha_layer is not None:
-            # get alpha
-            if alpha_layer in self.layers:
-                if self.layers[alpha_layer]['type'] != 'A8':
-                    raise Exception('alpha layer must be single channel')
-                
-                alpha_array = layer_A8.decompress(self.layers[alpha_layer]['data_stream'], self.size, debug=debug)
-                alpha_array = np.array(alpha_array, np.uint8)
-                alpha_array = np.flip(alpha_array.reshape(self.size[1], self.size[0], 1), 0)
-                
-            else: raise Exception('alpha layer not found')
+        # get alpha:
+        if alpha_layer in self.layers:
+            if self.layers[alpha_layer]['type'] != 'A8':
+                raise Exception('alpha layer must be single channel')
+            
+            alpha_array = layer_A8.decompress(self.layers[alpha_layer]['data_stream'], self.size, debug=debug)
+            alpha_array = np.array(alpha_array, np.uint8)
+            alpha_array = np.flip(alpha_array.reshape(self.size[1], self.size[0], 1), 0)
             
             image = Image.fromarray(obj=np.concatenate((main_array, alpha_array), axis=-1), mode='RGBA')
-
-        else:
-            # no alpha
+        
+        elif require_alpha: 
+            raise Exception('alpha layer not found, if you do not need alpha in the result, set `require_alpha` to False.')
+    
+        else: # no alpha
             image = Image.fromarray(obj=main_array, mode='RGB')
 
         return image
@@ -136,11 +135,8 @@ def load_from_pillow_image(image, debug=False):
     return txtimg
 
 
-def load_from_text(path):
-    """Load a text image from file, return TextImage object"""
-
-    with open(path, 'r') as f:
-        file: str = f.read()
+def load_from_text(file):
+    """Load a TextImage from text, return TextImage object"""
 
     header, layer_data_streams = file.split('|', 1) # split at first bar character
     
@@ -170,7 +166,17 @@ def load_from_text(path):
         txtimg.add_layer(ds, p[0], p[1], p[2]) 
 
     return txtimg
-    
+
+
+def load_from_text_file(path):
+    """Load a TextImage from text file, return TextImage object"""
+
+    with open(path, 'r') as f:
+        file: str = f.read()
+
+    return load_from_text(file)
+
+
 def split_by_lengths(data, lengths:list):
     """Split indexable data by a list of desired resulting lengths."""
     result = []
