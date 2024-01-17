@@ -14,7 +14,7 @@ Name | Index | Size
 raw RGB value | 0-21 | 3
 copy adjacent colour | 22-25 | 0
 index into a hash table like QOI | 26 | 1
-run-length encoding (RLE) of op codes | 27 | 2 or more
+run-length encoding (RLE) of op codes | 27 | 2-95
 luma difference volumes, size 1 | 28-72 | 1
 luma difference volumes, size 2 | 73-90 | 1
 unassigned | 91-93 | N/A
@@ -46,7 +46,7 @@ Name | Index | Size
 --- | --- | ---
 raw value | 0-2 | 1
 copy adjacent colour | 3-6 | 0
-run-length encoding (RLE) of op codes | 7 | 2 or more
+run-length encoding (RLE) of op codes | 7 | 2-95
 increasing difference | 8-50 | 0
 decreasing difference | 51-93 | 0
 

@@ -70,54 +70,58 @@ def ftup_to_col(ftup: tuple):
     )
 
 
-def chunk_RLE(chunks, func_get_op_size, func_get_op_index):
+def chunk_RLE(chunks, chunk_class) -> list:
     """Perform run-length encoding on a list of chunks. Replace chunks with repeat_op where applicable and return new list. Requires specifying functions to get operation size and index."""
-    
-    chunks_RLE = []
-    buffer = [(None, ())]
-    buffer_op = buffer[0][0] # cache the first operation name
 
-    def _buffer_contents(buffer, buffer_op):
-        buffer_size_chars = len(buffer) * (1 + func_get_op_size(buffer_op)) # (op, data)...
-        repeat_size_chars = 3 + len(buffer) * func_get_op_size(buffer_op) # op, op, repeat, (data)...
+    output = [] # output list for all chunks
+
+    buffer = []
+    buffer_op = None
+
+    def _buffer_contents(buffer):
+
+        repeat_size_chars = 3 + len(buffer) * buffer[0].size # op, op, repeat, (data)...
+        buffer_size_chars = len(buffer) * (1 + buffer[0].size) # (op, data)...
     
-        if buffer_size_chars > repeat_size_chars:
-            cd = [func_get_op_index(buffer_op), len(buffer)] # op and repeat count
-            for elem in buffer:
-                cd.extend(elem[1]) # append data for each buffer element
+        if repeat_size_chars < buffer_size_chars: 
+
+            cd = [buffer[0].index, len(buffer)] # op and repeat count
+            for elem in buffer: 
+                cd.extend(elem.data) # append data for each buffer element
             
-            cd = (('repeat_op',0), tuple(cd))
-
-            if repeat_size_chars != 1+len(cd[1]):
+            if repeat_size_chars != 1+len(cd):
                 raise Exception('mismatch in size measurements for RLE')
 
-            return [cd] # buffer replaced by single repeat op
+            return [chunk_class('repeat_op', 0, list(cd))] 
             
-        else: return buffer
+        else: 
+            return buffer # dump buffer unaltered
         
 
     for chunk in chunks:
-        if chunk[0] == buffer_op and len(buffer) < 93: # match op in buffer
-            buffer.append(chunk)
-        else:
-            if buffer_op is not None: chunks_RLE.extend(_buffer_contents(buffer, buffer_op))
-            buffer = [chunk]
-            buffer_op = buffer[0][0]
+        chunk: Chunk
+        if ((buffer_op != chunk.name) or (len(buffer) >= 93)) and buffer_op != None:
+            output.extend(_buffer_contents(buffer))
+            buffer = []
+        
+        buffer_op = chunk.name
+        buffer.append(chunk) # add current chunk to buffer
 
-    # get anything still in the buffer at the end
-    if buffer_op is not None: chunks_RLE.extend(_buffer_contents(buffer, buffer_op))
-    
-    return chunks_RLE
+    if buffer_op is not None: # output anything still in the buffer at the end (excl. None)
+        output.extend(_buffer_contents(buffer))
+
+    return output
 
 
 def analyse_chunks(chunks: list):
     """Analyse chunks to find occurences of operations for an understanding of compression effectiveness."""
     analysis = {}
-    for chunk_name, chunk_data in chunks:
-        if chunk_name in analysis:
-            analysis[chunk_name] += 1
+    for chunk in chunks:
+        chunk: Chunk
+        if chunk.name in analysis:
+            analysis[chunk.name] += 1
         else:
-            analysis[chunk_name] = 1
+            analysis[chunk.name] = 1
     #print(analysis)
 
     ordered_analysis = [(f'{a[0]}{a[1]}',b) for a,b in analysis.items()]
@@ -125,6 +129,45 @@ def analyse_chunks(chunks: list):
     ordered_analysis_dict = {a:b for a,b in ordered_analysis}
     print(ordered_analysis_dict)
     return ordered_analysis_dict
+
+
+class Chunk:
+    """A single chunk containing operation name and data"""
+
+    OPERATIONS = [] # list with short_name, short_index, size
+    
+    def __init__(self, short_name: str, short_name_index = 0, op_data = []):
+        if short_name is None:
+            self.name = (short_name, short_name_index)
+            self.index = None
+            self.size = None
+            self.data = op_data
+            return
+        
+        self.name = (short_name, short_name_index)
+        
+        if self.name not in self.OPERATIONS_DICT:
+            raise Exception(f'Unrecognised operation name: {self.name}')
+
+        self.index = self.OPERATIONS_DICT[self.name]
+
+        self.size = self.OPERATIONS[self.index][2]
+
+        if self.size is not None and len(op_data) != self.size:
+            raise Exception(f'Data does not match expected length')
+        
+        self.data = op_data
+
+    def __str__(self):
+        return f'{self.__class__.__name__}({self.name[0]}{self.name[1]} {self.data})'
+    
+    def indices(self) -> list:
+        return [self.index] + self.data
+
+    @classmethod
+    def set_operations(cls, operations):
+        cls.OPERATIONS = operations
+        cls.OPERATIONS_DICT = {(o[0],o[1]):i for i, o in enumerate(cls.OPERATIONS)}
 
 
 

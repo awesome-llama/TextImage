@@ -15,6 +15,8 @@ def list_files(directory):
 
 USE_A8_MAIN = ['submarine.png'] # images that should use A8 for the main purpose
 
+DEBUG = False
+
 # Create txtimg
 if True:
     DIRECTORY = 'images/'
@@ -24,21 +26,21 @@ if True:
         if file_name in USE_A8_MAIN:
             img = img.convert('L') # RGB to L
 
-        txtimg = image_io.load_from_pillow_image(img, debug=False)
+        txtimg = image_io.load_from_pillow_image(img, debug=DEBUG)
         print(txtimg)
         txtimg.save(DIRECTORY+'converted/'+file_name+'.txt')
 
 
 # Convert back to image:
-if False:
+if True:
     DIRECTORY = 'images/converted/'
     for file_name in list_files(DIRECTORY):
-        txtimg = image_io.load_from_text(DIRECTORY+file_name)
+        txtimg = image_io.load_from_text_file(DIRECTORY+file_name)
         print(txtimg)
         if 'alpha' in txtimg.layers:
-            image = txtimg.to_pillow_image(alpha_layer='alpha')
+            image = txtimg.to_pillow_image(alpha_layer='alpha', debug=DEBUG)
         else:
-            image = txtimg.to_pillow_image()
+            image = txtimg.to_pillow_image(debug=DEBUG)
         
         image.save(DIRECTORY+'to_image/'+file_name+'.png', format='png')
 
