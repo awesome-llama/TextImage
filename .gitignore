@@ -13,7 +13,7 @@ __pycache__
 *.dmp
 
 # images converted to text and back
-images/converted/
+images/converted/to_image/
 
 # Excel temp file
 ~$ops.xlsx
