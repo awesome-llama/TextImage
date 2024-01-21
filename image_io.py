@@ -190,37 +190,4 @@ def split_by_lengths(data, lengths:list):
     
 
 if __name__ == '__main__':
-    PATH = 'images/alphagrad.png'
-    #PATH = 'C:/Users/Atlas/Documents/Scratch/Image Format 2/all images/alltrue_mc_textures.png'
-    
-    print('COMPRESS')
-    img = Image.open(PATH)
-    txtimg = load_from_pillow_image(img, debug=False)
-    print(txtimg)
-    txtimg.save('output/compressed2.txt')
-
-    print('')
-
-    print('DECOMPRESS')
-    txtimg = load_from_text('output/compressed2.txt')
-    print(txtimg)
-    img = txtimg.to_pillow_image(alpha_layer='alpha')
-    print(img)
-    img.show()
-    img.save('output/decompressed.png')
-
-    #print(split_by_lengths('abcdefgh', [2, 3, 2, 1]))
-
-    # test: main channel to A8
-    """txtimg = load_from_image_file('images/rhodes_transparent.png')
-    txtimg.layers['main'] = txtimg.layers['alpha']
-    txtimg.layers.pop('alpha')
-
-    txtimg.save('output/compressed2.txt')
-
-    txtimg = load_from_text('output/compressed2.txt')
-    print(txtimg)
-    img = txtimg.to_pillow_image()
-    print(img)
-    img.show()
-    img.save('output/decompressed.png')"""
+    pass

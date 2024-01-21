@@ -1,20 +1,23 @@
 # TextImage
 
 ## Motivations
-The image format outlined here was necessitated by a lack of any decent way to store bitmap image data in Scratch. Scratch is limiting in that it cannot store binary data, only strings, booleans, and double floats within variables and lists. Common image formats like PNG and JPEG are unusable without being represented as plain text. This has been done before, commonly using base 64 or hexadecimal but it's not optimal as there are many more characters available but no simple and efficient way to utilise them, and this still ignores the fact that binary image formats are difficult to read/write using the available features of Scratch. Simpler representations of images are very common but are usually uncompressed, for example, hexadecimal numbers concatenated together. These are fine for many use cases but lack of compression and metadata can make them less usable for more complex projects.
+The image format outlined here was necessitated by the lack of any decent way to store bitmap image data in Scratch. Scratch is limiting in that binary data can not be stored, only strings, booleans, and double floats. Binary data represented using base 64 or hexadecimal numbers have been demonstrated but are suboptimal (there are many unused characters) and use of common binary image formats like BMP, PNG, and JPEG are difficult to read/write using Scratch's limited feature set. Instead, what is more common in Scratch is use of very simple and usually custom-made uncompressed formats, for example, hexadecimal numbers for each pixel concatenated together. Many of these formats lack essential features necessary for adoption and standardisation. 
 
 
 ## Format Outline
-- Supports an arbitrary number of colour channels including lossless 8-bit per channel RGB bitmap images and lossless 8-bit per channel generic (e.g. for alpha).
+- Supports an arbitrary number of colour channels including lossless 8-bits per channel RGB bitmap images and lossless 8-bits per channel generic (e.g. for alpha).
 - Uses printable ASCII characters only, no spaces and no newlines.
-- Simple enough to implement in scratch (while also minimising the number of blocks and variables), enabling it to be more easily be used by others.
-- Offers significantly smaller file sizes compared to pre-existing Scratch methods.
+- Simple enough to implement in Scratch (minimising the number of blocks and variables), enabling it to be more easily used in projects.
+- Offers significantly smaller file sizes compared to pre-existing Scratch methods, and in some cases even better than common image formats like PNG.
 
-[TextImage examples](images/converted)
+### Links
+- [Example images](images/converted)
+- [Scratch Reference Implementation](https://scratch.mit.edu/projects/945312296/)
+- [List of projects using TextImage](documentation/adoption.md)
 
 
 ## Format Specifications
-This format stores images as printable text using 94 of the 95 printable ASCII characters. The one character excluded is space.
+This format stores images as printable text using 94 of the 95 printable ASCII characters. The one character excluded is space. In the commonly-used [UTF-8 text encoding](https://en.wikipedia.org/wiki/UTF-8), these characters each have a size of 1 byte.
 
 The full ordered set of characters in use, indexed 0-93:
 
@@ -49,7 +52,7 @@ Pixels are ordered left-to-right (x axis), bottom-to-top (y axis).
 
 
 ### Data Streams
-See [data_streams.md](data_streams.md).
+See [data_streams.md](documentation/data_streams.md) for detailed information on them.
 
 
 ## Dependencies
@@ -59,12 +62,21 @@ See [data_streams.md](data_streams.md).
 
 
 ## Usage
-Use the methods defined in [image_io.py](image_io.py). 
+### Previewing
+For a quick preview of an image that does not require writing your own code, you can run `quick_preview.py` to preview the TextImage stored in your system clipboard.
 
-An image can be stored as a `TextImage` object. To convert it to a Pillow Image object, use the method `to_pillow_image()` (and from there you can manipulate or save it). To create a TextImage object, use `load_from_pillow_image()` to load from a Pillow Image object or  `load_from_text_file()` to load from a saved TextImage text file. To save a TextImage object as a text file, use the `save()` method.
+
+### Code
+Use the methods defined in [image_io.py](image_io.py). An image can be stored as a `TextImage` object.
+
+- To create a TextImage object, use `load_from_pillow_image()` to load from a Pillow Image object. Use Pillow if you want to load an image from a file like PNG or JPG. If you already have a TextImage file, use `load_from_text_file()` or `load_from_text()` if it was a Python string. 
+- To convert a TextImage object to a Pillow Image object, use the method `to_pillow_image()` (and from there you can manipulate or save it). 
+- To save a TextImage object as a TextImage file, use the `save()` method or `text()` if you want it as a Python string.
+
+If you want more control such as creating arbitrary channels, you can create a blank TextImage object, specifying the image dimensions, and then add channels using `add_layer()`, which gives full control over data stream type, purpose, and of course, the data itself.
 
 
 ## Current Issues
 ### Performance
-The Python reference encoder and decoder is slow. It should however be OK for Scratch usage with the size of images typically used there.
+The Python reference encoder and decoder is slow however for the resolution of images used in Scratch it's not much of an issue.
 

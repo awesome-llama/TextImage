@@ -1,6 +1,6 @@
 Data streams consist of "chunks". Each chunk contains an operation where the first character is the "op code" (op is short for operation). All characters after are "op data". The op codes are indexed from 0. Each op code has a defined size, except for RLE which specifies it as part of its data. The size only counts the op data. The encoder prioritises smaller operations to get the best compression.
 
-Refer to [ops.xlsx](ops.xlsx) for tables of all operations.
+Refer to [ops.xlsx](documentation/ops.xlsx) for tables of all operations.
 
 # RGB8
 *RGB data, 8 bits per channel*
