@@ -31,24 +31,31 @@ The image format begins with magic number `txtimg`. This follows with a comma an
 - image width `x` in pixels 
 - image height `y` in pixels
 - list of data stream properties `p` containing 4 alternating property values. First value indicates the total number of items in the list. The following properties are (in this order): 
-    - purpose within the image (`main`, `alpha`, etc.)
+    - purpose within the image (`main`, `alpha`, etc. `main` is the main colour channel and should be highest priority. All images should have one. `alpha` indicates the layer is for transparency. No other purpose is currently defined, it is open to custom use cases where additional layers are needed)
     - data stream type (`RGB8`, `A8`, etc.)
     - data stream version (`0` for all data streams currently)
     - data stream length (number of characters in the data stream by itself)
 
 A vertical bar (`|`) then indicates the data streams will follow, which are all concatenated without any separating character. 
 
-An example image looks like this (with the concatenated data streams removed):
-
-```txtimg,v:0,x:120,y:80,p:8,main,RGB8,0,22682,alpha,A8,0,523|```
-
-This example is a 120x80 image with 8 bit RGB and alpha channels. The RGB8 data stream is 22682 characters long whereas the alpha channel is 523 characters.
-
-Reserved characters due to their usage as separators: `,:|` They must not be used within keys or values.
+Reserved characters due to their usage as separators: `,` `:` `|` They must not be used within keys or values.
 
 Use of custom key names to store additional data is allowed however to avoid potential future conflicts prefix an underscore to the key name (these are reserved for custom use). 
 
-Pixels are ordered left-to-right (x axis), bottom-to-top (y axis).
+Data streams use pixels that are ordered left-to-right (x axis), bottom-to-top (y axis).
+
+### Example
+The following is an example TextImage file, with explanation for some of the parts:
+
+```
+txtimg,v:0,x:14,y:17,p:8,main,RGB8,0,142,alpha,A8,0,101|<7?40vV53c><7)877798<7)877798<7)87779;!7H+B.D`@"Co8787779;j<7)8777953f!=J787;b77987779;!8787;!879877794e6p878787798<7N""?q!(FD<7)877798<7)8<7>!!($/T($,%$%($,%$%($,%$%($,%$%($,%$%($,%$%($,%$%($,%$%($,%$%($,%($&%$$$)($&T($,%$%($,%$%($,%$%($,%($/
+```
+
+- `txtimg,v:0,x:14,y:17` TextImage file, version 0, dimensions 14x17
+- `p:8,main,RGB8,0,142,alpha,A8,0,101` Properties containing 8 list items to follow, specifying a main RGB8 data stream that is 142 characters long and an alpha A8 data stream that is 101 characters long.
+- `|` The concatenated data streams follow, in the order given by the properties (RGB8 and then A8)
+- ```<7?40vV53c><7)877798<7)877798<7)87779;!7H+B.D`@"Co8787779;j<7)8777953f!=J787;b77987779;!8787;!879877794e6p878787798<7N""?q!(FD<7)877798<7)8<7>``` RGB8 data stream
+- ```!!($/T($,%$%($,%$%($,%$%($,%$%($,%$%($,%$%($,%$%($,%$%($,%$%($,%($&%$$$)($&T($,%$%($,%$%($,%$%($,%($/``` A8 data stream
 
 
 ### Data Streams
