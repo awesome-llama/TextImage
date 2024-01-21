@@ -33,7 +33,7 @@ All the volumes are positioned in Y'UV space to best cover the spread of possibl
 ### RLE
 Run-length encoding is handled as a 2nd pass in the encoder. Its goal is to reduce the number of repeating op codes (note: not op data). A single RLE operation consists of 2 fixed data characters, which is the operation it will repeat and then the number of times it will be repeated (0-93 times). This does mean it is possible to specify itself as the character to repeat but this is not implemented due to the complexity it would add.
 
-Uses the function `chunk_RLE()` in [../layer_utils.py](layer_utils.py).
+Uses the function `chunk_RLE()` in [layer_utils.py](../layer_utils.py).
 
 
 # A8
