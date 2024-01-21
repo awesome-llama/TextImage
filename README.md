@@ -25,7 +25,7 @@ The full ordered set of characters in use, indexed 0-93:
 
 An arbitrary number of "data streams" can be specified. Each data stream has corresponding properties to specify their type and usage. This enables easy expansion to support new methods beyond the 8-bit RGB and 8-bit generic lossless data streams currently implemented.
 
-The image format begins with magic number `txtimg`. This follows with a comma and then these key-value pairs separated by commas. Semicolons go between the key name and value. Identical implementation to [my save code format](https://awesome-llama.github.io/articles/my-save-code-format). This part of the format is known as `CSKV` or "comma-separated key-values".
+The image format begins with magic number `txtimg`. This follows with a comma and then these key-value pairs separated by commas. Semicolons go between the key name and value. Identical implementation to [my save code format](https://awesome-llama.github.io/articles/my-save-code-format). This part of the format is known as CSKV or "comma-separated key-values".
 
 - version number `v` (currently `0`)
 - image width `x` in pixels 
@@ -44,7 +44,7 @@ An example image looks like this (with the concatenated data streams removed):
 
 This example is a 120x80 image with 8 bit RGB and alpha channels. The RGB8 data stream is 22682 characters long whereas the alpha channel is 523 characters.
 
-Reserved characters due to their usage as separators: `,:|`
+Reserved characters due to their usage as separators: `,:|` They must not be used within keys or values.
 
 Use of custom key names to store additional data is allowed however to avoid potential future conflicts prefix an underscore to the key name (these are reserved for custom use). 
 

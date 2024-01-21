@@ -1,6 +1,6 @@
 Data streams consist of "chunks". Each chunk contains an operation where the first character is the "op code" (op is short for operation). All characters after are "op data". The op codes are indexed from 0. Each op code has a defined size, except for RLE which specifies it as part of its data. The size only counts the op data. The encoder prioritises smaller operations to get the best compression.
 
-Refer to [ops.xlsx](documentation/ops.xlsx) for tables of all operations.
+Refer to [ops.xlsx](ops.xlsx) for tables of all operations.
 
 # RGB8
 *RGB data, 8 bits per channel*
@@ -33,7 +33,7 @@ All the volumes are positioned in Y'UV space to best cover the spread of possibl
 ### RLE
 Run-length encoding is handled as a 2nd pass in the encoder. Its goal is to reduce the number of repeating op codes (note: not op data). A single RLE operation consists of 2 fixed data characters, which is the operation it will repeat and then the number of times it will be repeated (0-93 times). This does mean it is possible to specify itself as the character to repeat but this is not implemented due to the complexity it would add.
 
-Uses the function `chunk_RLE()` in [layer_utils.py](layer_utils.py).
+Uses the function `chunk_RLE()` in [../layer_utils.py](layer_utils.py).
 
 
 # A8
