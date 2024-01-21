@@ -13,7 +13,7 @@ def list_files(directory):
     
     return files
 
-USE_A8_MAIN = ['submarine.png'] # images that should use A8 for the main purpose
+USE_A8_MAIN = ['submarine.png', 'tweed volcano.png'] # images that should use A8 for the main purpose
 
 DEBUG = False
 
