@@ -50,10 +50,10 @@ def vol_index_to_col(index: int, origin=(0,0,0), dimensions=(21,20,20)):
 
 
 def col_to_ftup(colour: tuple):
-    """ftup, or 4-tuple uses a mixed base of (22,94,94,94) for representing a 3-tuple with bases (256,256,256)."""
+    """ftup, or 4-tuple uses a mixed base of (21,94,94,94) for representing a 3-tuple with bases (256,256,256)."""
     dec = 65536*colour[0] + 256*colour[1] + colour[2]
     return (
-        dec // (94*94*94) % 22,
+        dec // (94*94*94) % 21,
         (dec // (94*94)) % 94,
         (dec // 94) % 94,
         dec % 94
@@ -61,7 +61,7 @@ def col_to_ftup(colour: tuple):
 
 
 def ftup_to_col(ftup: tuple):
-    """ftup, or 4-tuple uses a mixed base of (22,94,94,94) for representing a 3-tuple with bases (256,256,256)."""
+    """ftup, or 4-tuple uses a mixed base of (21,94,94,94) for representing a 3-tuple with bases (256,256,256)."""
     dec = 830584*ftup[0] + 8836*ftup[1] + 94*ftup[2] + ftup[3]
     return (
         (dec // 65536) % 256,
