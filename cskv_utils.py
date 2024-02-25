@@ -47,24 +47,36 @@ def CSKV_read(data:str, remove_magic_number=False, remove_end_comma=True, remove
 
     for item in items:
         if ':' in item:
-            if len(output.get(current_key, [])) == 1:
-                output[current_key] = output[current_key][0] # remove list for single items
+            k, *v = item.split(':') # split the string into a var and a list for everything after it
             
-            k, *v = item.split(':')
-            
-            if len(v) > 1: 
-                raise Exception('unexpected colon')
+            if len(v) > 1: raise Exception('unexpected colon')
 
-            output[k] = [] if remove_list_length else v
+            output[k] = v 
             current_key = k
         
         elif current_key is None:
-            output[None] = item
+            output[None] = [item]
         
         else:
             output[current_key].append(item)
 
-    return output
+    # clean up the output
+    output_clean = {}
+    for k,v in output.items():
+        if isinstance(v, list):
+            if len(v) == 1:
+                v = v[0] # remove list for single items
+            elif remove_list_length and len(v) > 1:
+                if v[0] == '0':
+                    v = [] # empty list
+                else:
+                    v.pop(0) # remove length element
+            
+            output_clean[k] = v
+        else:
+            raise Exception('not a list')
+
+    return output_clean
 
 
 
@@ -78,7 +90,7 @@ if __name__ == '__main__':
     print(temp)
     print(CSKV_read(temp))
     print('')
-
+    
     # lists
     temp = {'a':[555],'b':[100, 'test0'],'c':[],'d':['test2', 'test3']}
     print(temp)
@@ -94,3 +106,5 @@ if __name__ == '__main__':
     print(temp)
     print(CSKV_read(temp))
     print('')
+
+    print(CSKV_read('a:,:,',))
