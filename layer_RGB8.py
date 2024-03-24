@@ -2,6 +2,7 @@
 
 import json
 import layer_utils as lu
+from itertools import chain
 
 DEFAULT_VAL = (0,0,0)
 VOLUMES = [[(-2,-1,-1),(5,4,4),1],[(-2,3,-1),(5,4,4),1],[(-2,-5,-1),(5,4,4),1],[(-2,-5,2),(5,4,4),1],[(-2,3,2),(5,4,4),1],[(-2,-1,2),(5,4,4),1],[(-2,-5,-5),(5,4,4),1],[(-2,3,-5),(5,4,4),1],[(-2,-1,-5),(5,4,4),1],[(3,-1,-5),(5,4,4),1],[(3,3,-5),(5,4,4),1],[(3,-5,-5),(5,4,4),1],[(3,-1,2),(5,4,4),1],[(3,3,2),(5,4,4),1],[(3,-5,2),(5,4,4),1],[(3,-5,-1),(5,4,4),1],[(3,3,-1),(5,4,4),1],[(3,-1,-1),(5,4,4),1],[(8,-1,-1),(5,4,4),1],[(8,3,-1),(5,4,4),1],[(8,-5,-1),(5,4,4),1],[(8,-5,2),(5,4,4),1],[(8,3,2),(5,4,4),1],[(8,-1,2),(5,4,4),1],[(8,-5,-5),(5,4,4),1],[(8,3,-5),(5,4,4),1],[(8,-1,-5),(5,4,4),1],[(-7,-1,-5),(5,4,4),1],[(-7,3,-5),(5,4,4),1],[(-7,-5,-5),(5,4,4),1],[(-7,-1,2),(5,4,4),1],[(-7,3,2),(5,4,4),1],[(-7,-5,2),(5,4,4),1],[(-7,-5,-1),(5,4,4),1],[(-7,3,-1),(5,4,4),1],[(-7,-1,-1),(5,4,4),1],[(-12,-1,-1),(5,4,4),1],[(-12,3,-1),(5,4,4),1],[(-12,-5,-1),(5,4,4),1],[(-12,-5,2),(5,4,4),1],[(-12,3,2),(5,4,4),1],[(-12,-1,2),(5,4,4),1],[(-12,-5,-5),(5,4,4),1],[(-12,3,-5),(5,4,4),1],[(-12,-1,-5),(5,4,4),1],[(-10,7,-9),(21,20,20),2],[(-10,-25,-9),(21,20,20),2],[(-10,-9,7),(21,20,20),2],[(-10,-9,-24),(21,20,20),2],[(11,-9,-8),(21,20,20),2],[(-31,-9,-8),(21,20,20),2],[(32,-9,-8),(21,20,20),2],[(-52,-9,-8),(21,20,20),2],[(53,-9,-8),(21,20,20),2],[(-73,-9,-8),(21,20,20),2],[(11,-9,-24),(21,20,20),2],[(11,-9,7),(21,20,20),2],[(11,-25,-9),(21,20,20),2],[(11,7,-9),(21,20,20),2],[(-31,7,-9),(21,20,20),2],[(-31,-25,-9),(21,20,20),2],[(-31,-9,7),(21,20,20),2],[(-10,11,-29),(21,20,20),2]]
@@ -139,10 +140,7 @@ def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, de
             f.writelines(str(c)+'\n' for c in chunks)
 
     # final pass to convert chunks into strings:
-    string_chunks = []
-    for chunk in chunks:
-        chunk: ChunkRGB8
-        string_chunks.append(lu.index_to_txt(chunk.indices()))
+    string_chunks = lu.indices_to_txt(chain.from_iterable([c.indices() for c in chunks]))
 
     if debug:
         size_pixels = dimensions[0]*dimensions[1]
@@ -159,32 +157,31 @@ def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, de
 def decompress(stream:str, dimensions:tuple, debug=False):
     """Decompress RGB 8 bit per channel data stream"""
 
-    def _add_colour(colour: tuple, c):
-        #image_array.append((c.size*63,c.size*63,c.size*63)) # preview efficiency
+    def _add_colour(colour: tuple):
         image_array.append(colour)
         col_prev.insert(0, colour)
         col_prev.pop(-1)
         col_table[(colour[0]*3 + colour[1]*5 + colour[2]*7) % 94] = colour
 
-    def _process_chunk(chunk):
+    def _process_chunk(chunk: ChunkRGB8):
         match chunk.name[0]:
             case 'raw':
-                _add_colour(lu.ftup_to_col((chunk.name[1], chunk.data[0], chunk.data[1], chunk.data[2])), chunk.name)
+                _add_colour(lu.ftup_to_col((chunk.name[1], chunk.data[0], chunk.data[1], chunk.data[2])))
 
             case 'copy_prev':
-                _add_colour(col_prev[0], chunk)
+                _add_colour(col_prev[0])
 
             case 'copy_vert_fwd':
-                _add_colour(col_prev[dimensions[0] - 2], chunk)
+                _add_colour(col_prev[dimensions[0] - 2])
 
             case 'copy_vert':
-                _add_colour(col_prev[dimensions[0] - 1], chunk)
+                _add_colour(col_prev[dimensions[0] - 1])
 
             case 'copy_vert_back':
-                _add_colour(col_prev[dimensions[0] + 0], chunk)
+                _add_colour(col_prev[dimensions[0] + 0])
 
             case 'hash_table':
-                _add_colour(col_table[chunk.data[0]], chunk)
+                _add_colour(col_table[chunk.data[0]])
             
             case 'vol':
                 if chunk.size == 1:
@@ -194,22 +191,22 @@ def decompress(stream:str, dimensions:tuple, debug=False):
                 
                 YUV_diff = lu.vol_index_to_col(index, VOLUMES[chunk.name[1]][0], VOLUMES[chunk.name[1]][1])
                 col_diff = YUV_to_RGB(YUV_diff)
-                _add_colour((col_prev[0][0]+col_diff[0], col_prev[0][1]+col_diff[1], col_prev[0][2]+col_diff[2]), chunk)
+                _add_colour((col_prev[0][0]+col_diff[0], col_prev[0][1]+col_diff[1], col_prev[0][2]+col_diff[2]))
 
             case _:
                 raise Exception(f'Chunk name {op_name} unknown')
 
-
+    stream = lu.txt_to_indices(stream) # convert from text to list of indices
+    
     # iterate over entire image to get intermediate format:
     chunks = []
     i = 0
     while i < len(stream):
-        
-        op_name = get_op_name(lu.char_index(stream[i]))
+        op_name = get_op_name(stream[i])
 
         if op_name[0] == 'repeat_op':
-            repeat_op_name = get_op_name(lu.char_index(stream[i+1])) # the op that should be repeated
-            repeat = 2 + lu.char_index(stream[i+2]) * get_op_size(repeat_op_name)
+            repeat_op_name = get_op_name(stream[i+1]) # the op that should be repeated
+            repeat = 2 + stream[i+2] * get_op_size(repeat_op_name)
         else:
             repeat = get_op_size(op_name)
         
@@ -217,7 +214,7 @@ def decompress(stream:str, dimensions:tuple, debug=False):
         op_data = []
         for _ in range(repeat): # add op data
             i += 1
-            op_data.append(lu.char_index(stream[i]))
+            op_data.append(stream[i])
 
         chunks.append(ChunkRGB8(op_name[0], op_name[1], op_data))
         i += 1

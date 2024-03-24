@@ -3,20 +3,14 @@
 # the set of b94 chars
 CHARS = '!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
 
-CHAR_LOOKUP = {char:i for i,char in enumerate(CHARS)}
+def indices_to_txt(indices: list):
+    """Convert a list of indices into a string using the character table"""
+    return ''.join([CHARS[i] for i in indices])
+    
 
-
-def index_to_txt(indices):
-    """Convert a number or list of numbers into a string of b94 chars"""
-    if isinstance(indices, list) or isinstance(indices, tuple):
-        return ''.join([CHARS[i] for i in indices])
-    return CHARS[indices]
-
-
-def char_index(char):
-    """Get the index of a character"""
-    return CHAR_LOOKUP[char]
-
+def txt_to_indices(text: str):
+    """Convert string into a list of indices using the character table"""
+    return [CHARS.index(char) for char in text]
 
 
 def col_to_vol_index(colour: tuple, origin=(0,0,0), dimensions=(21,20,20)):
@@ -134,7 +128,12 @@ def analyse_chunks(chunks: list):
 class Chunk:
     """A single chunk containing operation name and data"""
 
-    OPERATIONS = [] # list with short_name, short_index, size
+    #OPERATIONS = [] # list with short_name, short_index, size
+    @classmethod
+    def set_operations(cls, operations):
+        """Set the class OPERATIONS for use by all instances"""
+        cls.OPERATIONS = operations
+        cls.OPERATIONS_DICT = {(o[0],o[1]):i for i, o in enumerate(cls.OPERATIONS)}
     
     def __init__(self, short_name: str, short_name_index = 0, op_data = []):
         if short_name is None:
@@ -162,18 +161,15 @@ class Chunk:
         return f'{self.__class__.__name__}({self.name[0]}{self.name[1]} {self.data})'
     
     def indices(self) -> list:
+        """Get the chunk as a list of indices"""
         return [self.index] + self.data
 
-    @classmethod
-    def set_operations(cls, operations):
-        cls.OPERATIONS = operations
-        cls.OPERATIONS_DICT = {(o[0],o[1]):i for i, o in enumerate(cls.OPERATIONS)}
 
 
 
 if __name__ == '__main__':
-    print(index_to_txt(0))
-    print(char_index('!'))
+    print(indices_to_txt([0]))
+    print(txt_to_indices('Hello!'))
 
     print(col_to_ftup((12,14,16)))
 
