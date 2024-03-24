@@ -14,21 +14,6 @@ class ChunkRGB8(lu.Chunk):
 
 ChunkRGB8.set_operations(OPERATIONS)
 
-OP_INDICES = {(op_data[0],op_data[1]):(i,op_data[2]) for i, op_data in enumerate(OPERATIONS)}
-
-
-def get_op_index(op_name: tuple):
-    """Return the op index from a 2-tuple name"""
-    return OP_INDICES[op_name][0]
-
-def get_op_size(op_name: tuple):
-    """Return the op size from a 2-tuple name"""
-    return OP_INDICES[op_name][1]
-
-def get_op_name(index: int):
-    """Return the 2-tuple op name of an index"""
-    return (OPERATIONS[index][0], OPERATIONS[index][1])
-
 
 def RGB_to_YUV(rgb: tuple):
     """R'G'B' to Y'UV (g, b-g, r-g)"""
@@ -202,13 +187,13 @@ def decompress(stream:str, dimensions:tuple, debug=False):
     chunks = []
     i = 0
     while i < len(stream):
-        op_name = get_op_name(stream[i])
+        op_name = ChunkRGB8.get_op_name(stream[i])
 
         if op_name[0] == 'repeat_op':
-            repeat_op_name = get_op_name(stream[i+1]) # the op that should be repeated
-            repeat = 2 + stream[i+2] * get_op_size(repeat_op_name)
+            repeat_op_name = ChunkRGB8.get_op_name(stream[i+1]) # the op that should be repeated
+            repeat = 2 + stream[i+2] * ChunkRGB8.get_op_size(repeat_op_name)
         else:
-            repeat = get_op_size(op_name)
+            repeat = ChunkRGB8.get_op_size(op_name)
         
         
         op_data = []
@@ -231,8 +216,8 @@ def decompress(stream:str, dimensions:tuple, debug=False):
     for chunk in chunks:
         chunk: ChunkRGB8
         if chunk.name[0] == 'repeat_op':
-            op_name = get_op_name(chunk.data[0])
-            op_size = get_op_size(op_name)
+            op_name = ChunkRGB8.get_op_name(chunk.data[0])
+            op_size = ChunkRGB8.get_op_size(op_name)
             repeat = chunk.data[1]
 
             for i in range(repeat):

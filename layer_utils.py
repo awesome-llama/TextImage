@@ -128,13 +128,6 @@ def analyse_chunks(chunks: list):
 class Chunk:
     """A single chunk containing operation name and data"""
 
-    #OPERATIONS = [] # list with short_name, short_index, size
-    @classmethod
-    def set_operations(cls, operations):
-        """Set the class OPERATIONS for use by all instances"""
-        cls.OPERATIONS = operations
-        cls.OPERATIONS_DICT = {(o[0],o[1]):i for i, o in enumerate(cls.OPERATIONS)}
-    
     def __init__(self, short_name: str, short_name_index = 0, op_data = []):
         if short_name is None:
             self.name = (short_name, short_name_index)
@@ -164,7 +157,28 @@ class Chunk:
         """Get the chunk as a list of indices"""
         return [self.index] + self.data
 
+    
+    @classmethod
+    def set_operations(cls, operations):
+        """Set the class OPERATIONS for use by all instances"""
+        cls.OPERATIONS = operations
+        cls.OPERATIONS_DICT = {(o[0],o[1]):i for i, o in enumerate(operations)}
+        cls.OP_INDICES = {(op_data[0],op_data[1]):(i,op_data[2]) for i, op_data in enumerate(operations)}
+    
+    @classmethod
+    def get_op_index(cls, op_name: tuple):
+        """Return the op index from a 2-tuple name"""
+        return cls.OP_INDICES[op_name][0]
 
+    @classmethod
+    def get_op_size(cls, op_name: tuple):
+        """Return the op size from a 2-tuple name"""
+        return cls.OP_INDICES[op_name][1]
+
+    @classmethod
+    def get_op_name(cls, index: int):
+        """Return the 2-tuple op name of an index"""
+        return (cls.OPERATIONS[index][0], cls.OPERATIONS[index][1])
 
 
 if __name__ == '__main__':
