@@ -181,6 +181,22 @@ class Chunk:
         return (cls.OPERATIONS[index][0], cls.OPERATIONS[index][1])
 
 
+
+class DataStream:
+    """An encoded TextImage data stream with type and version"""
+
+    def __init__(self, data_stream: str, type: str, version: str):
+        self.data_stream = str(data_stream)
+        self.type = str(type)
+        self.version = str(version)
+    
+    def __str__(self):
+        return f'DataStream using {self.type}_v{self.version}'
+    
+
+
+
+
 if __name__ == '__main__':
     print(indices_to_txt([0]))
     print(txt_to_indices('Hello!'))
