@@ -3,6 +3,7 @@
 import json
 import layer_utils as lu
 from itertools import chain
+from collections import deque
 
 DEFAULT_VAL = (0,0,0)
 VOLUMES = [[(-2,-1,-1),(5,4,4),1],[(-2,3,-1),(5,4,4),1],[(-2,-5,-1),(5,4,4),1],[(-2,-5,2),(5,4,4),1],[(-2,3,2),(5,4,4),1],[(-2,-1,2),(5,4,4),1],[(-2,-5,-5),(5,4,4),1],[(-2,3,-5),(5,4,4),1],[(-2,-1,-5),(5,4,4),1],[(3,-1,-5),(5,4,4),1],[(3,3,-5),(5,4,4),1],[(3,-5,-5),(5,4,4),1],[(3,-1,2),(5,4,4),1],[(3,3,2),(5,4,4),1],[(3,-5,2),(5,4,4),1],[(3,-5,-1),(5,4,4),1],[(3,3,-1),(5,4,4),1],[(3,-1,-1),(5,4,4),1],[(8,-1,-1),(5,4,4),1],[(8,3,-1),(5,4,4),1],[(8,-5,-1),(5,4,4),1],[(8,-5,2),(5,4,4),1],[(8,3,2),(5,4,4),1],[(8,-1,2),(5,4,4),1],[(8,-5,-5),(5,4,4),1],[(8,3,-5),(5,4,4),1],[(8,-1,-5),(5,4,4),1],[(-7,-1,-5),(5,4,4),1],[(-7,3,-5),(5,4,4),1],[(-7,-5,-5),(5,4,4),1],[(-7,-1,2),(5,4,4),1],[(-7,3,2),(5,4,4),1],[(-7,-5,2),(5,4,4),1],[(-7,-5,-1),(5,4,4),1],[(-7,3,-1),(5,4,4),1],[(-7,-1,-1),(5,4,4),1],[(-12,-1,-1),(5,4,4),1],[(-12,3,-1),(5,4,4),1],[(-12,-5,-1),(5,4,4),1],[(-12,-5,2),(5,4,4),1],[(-12,3,2),(5,4,4),1],[(-12,-1,2),(5,4,4),1],[(-12,-5,-5),(5,4,4),1],[(-12,3,-5),(5,4,4),1],[(-12,-1,-5),(5,4,4),1],[(-10,7,-9),(21,20,20),2],[(-10,-25,-9),(21,20,20),2],[(-10,-9,7),(21,20,20),2],[(-10,-9,-24),(21,20,20),2],[(11,-9,-8),(21,20,20),2],[(-31,-9,-8),(21,20,20),2],[(32,-9,-8),(21,20,20),2],[(-52,-9,-8),(21,20,20),2],[(53,-9,-8),(21,20,20),2],[(-73,-9,-8),(21,20,20),2],[(11,-9,-24),(21,20,20),2],[(11,-9,7),(21,20,20),2],[(11,-25,-9),(21,20,20),2],[(11,7,-9),(21,20,20),2],[(-31,7,-9),(21,20,20),2],[(-31,-25,-9),(21,20,20),2],[(-31,-9,7),(21,20,20),2],[(-10,11,-29),(21,20,20),2]]
@@ -48,12 +49,11 @@ def limit_RGB(col:tuple):
 
 def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
     def _add_colour(colour: tuple):
-        col_prev.insert(0, colour)
-        col_prev.pop(-1)
+        col_prev.appendleft(colour)
         col_table[(colour[0]*3 + colour[1]*5 + colour[2]*7) % 94] = colour # hashed index
-
-    col_prev = [DEFAULT_VAL for _ in range(dimensions[0] + 2)]
-    col_table = [DEFAULT_VAL for _ in range(len(lu.CHARS))]
+    
+    col_prev = deque([DEFAULT_VAL] * (dimensions[0]+2), dimensions[0]+2)
+    col_table = [DEFAULT_VAL] * len(lu.CHARS)
     chunks = [] 
     
     for col in image_array:
@@ -144,8 +144,7 @@ def decompress(stream:str, dimensions:tuple, debug=False):
 
     def _add_colour(colour: tuple):
         image_array.append(colour)
-        col_prev.insert(0, colour)
-        col_prev.pop(-1)
+        col_prev.appendleft(colour)
         col_table[(colour[0]*3 + colour[1]*5 + colour[2]*7) % 94] = colour
 
     def _process_chunk(chunk: ChunkRGB8):
@@ -210,7 +209,7 @@ def decompress(stream:str, dimensions:tuple, debug=False):
     
     # read intermediate and emit pixels into output list
     image_array = []
-    col_prev = [DEFAULT_VAL for _ in range(dimensions[0] + 2)]
+    col_prev = deque([DEFAULT_VAL] * (dimensions[0]+2), dimensions[0]+2)
     col_table = [DEFAULT_VAL for _ in range(len(lu.CHARS))]
     
     for chunk in chunks:
