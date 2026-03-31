@@ -13,39 +13,39 @@ def txt_to_indices(text: str):
     return [CHARS.index(char) for char in text]
 
 
-def col_to_vol_index(colour: tuple, origin=(0,0,0), dimensions=(21,20,20)):
-    """Return the index of the colour inside the volume, None if out of bounds"""
+def col_to_vol_index(color: tuple, origin=(0,0,0), dimensions=(21,20,20)):
+    """Return the index of the color inside the volume, None if out of bounds"""
 
-    relative_colour = (colour[0]-origin[0], colour[1]-origin[1], colour[2]-origin[2])
+    relative_color = (color[0]-origin[0], color[1]-origin[1], color[2]-origin[2])
     
-    if relative_colour[0] >= 0 and relative_colour[0] < dimensions[0] and \
-        relative_colour[1] >= 0 and relative_colour[1] < dimensions[1] and \
-        relative_colour[2] >= 0 and relative_colour[2] < dimensions[2]:
+    if relative_color[0] >= 0 and relative_color[0] < dimensions[0] and \
+        relative_color[1] >= 0 and relative_color[1] < dimensions[1] and \
+        relative_color[2] >= 0 and relative_color[2] < dimensions[2]:
         
-        return dimensions[1]*dimensions[2]*relative_colour[0] + dimensions[2]*relative_colour[1] + relative_colour[2]
+        return dimensions[1]*dimensions[2]*relative_color[0] + dimensions[2]*relative_color[1] + relative_color[2]
     
     return None
 
 
 def vol_index_to_col(index: int, origin=(0,0,0), dimensions=(21,20,20)):
-    """Return the colour inside the volume, None if out of bounds"""
+    """Return the color inside the volume, None if out of bounds"""
     if index is None: return None
 
     if index >= 0 or index < (dimensions[2]*dimensions[1]*dimensions[0]):
-        relative_colour = (
+        relative_color = (
             index // (dimensions[2]*dimensions[1]) % dimensions[0],
             (index // dimensions[2]) % dimensions[1],
             index % dimensions[2]
         )
         
-        return (relative_colour[0]+origin[0], relative_colour[1]+origin[1], relative_colour[2]+origin[2])
+        return (relative_color[0]+origin[0], relative_color[1]+origin[1], relative_color[2]+origin[2])
     
     return None
 
 
-def col_to_ftup(colour: tuple):
+def col_to_ftup(color: tuple):
     """ftup, or 4-tuple uses a mixed base of (21,94,94,94) for representing a 3-tuple with bases (256,256,256)."""
-    dec = 65536*colour[0] + 256*colour[1] + colour[2]
+    dec = 65536*color[0] + 256*color[1] + color[2]
     return (
         dec // (94*94*94) % 21,
         (dec // (94*94)) % 94,

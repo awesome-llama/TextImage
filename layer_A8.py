@@ -24,8 +24,8 @@ def limit_A(a):
 
 
 def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
-    def _add_val(colour: tuple):
-        col_prev.appendleft(colour)
+    def _add_val(color: tuple):
+        col_prev.appendleft(color)
     
     col_prev = deque([DEFAULT_VAL] * (dimensions[0]+2), dimensions[0]+2)
     chunks = [] 
@@ -101,9 +101,9 @@ def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, de
 def decompress(stream:str, dimensions:tuple, debug=False):
     """Decompress generic 8 bit per channel data stream (e.g. alpha)"""
 
-    def _add_val(colour):
-        image_array.append(colour)
-        col_prev.appendleft(colour)
+    def _add_val(color):
+        image_array.append(color)
+        col_prev.appendleft(color)
     
     def _process_chunk(chunk):
         match chunk.name[0]:

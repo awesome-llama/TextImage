@@ -13,13 +13,14 @@ def list_files(directory):
     
     return files
 
-USE_A8_MAIN = ['submarine.png', 'tweed volcano.png'] # images that should use A8 for the main purpose
+USE_A8_MAIN = ['submarine.png', 'tweed_volcano.png'] # images that should use A8 for the main purpose
 
 DEBUG = False
 
 # Create txtimg
 if True:
     DIRECTORY = 'images/'
+    os.makedirs(DIRECTORY+'converted/', exist_ok=True)
     for file_name in list_files(DIRECTORY):
         print(file_name)
         img = Image.open(DIRECTORY+file_name)
@@ -34,6 +35,7 @@ if True:
 # Convert back to image:
 if True:
     DIRECTORY = 'images/converted/'
+    os.makedirs(DIRECTORY+'to_image/', exist_ok=True)
     for file_name in list_files(DIRECTORY):
         txtimg = image_io.load_from_text_file(DIRECTORY+file_name)
         print(txtimg)

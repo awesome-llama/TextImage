@@ -22,7 +22,7 @@ class TextImage:
         return f'TextImage v{self.version} {self.size[0]}x{self.size[1]} with {len(self.layers)} layers: {','.join([f'{k}:{str(ds)}' for k, ds in self.layers.items()])}'
 
     def set_layer(self, purpose: str, encoded_data_stream: lu.DataStream):
-        """Add a layer to the image or replace an existing one. Purpose should be `main` for the main colour layer or `alpha` for transparency. Purpose will be converted to a lowercase string."""
+        """Add a layer to the image or replace an existing one. Purpose should be `main` for the main color layer or `alpha` for transparency. Purpose will be converted to a lowercase string."""
         purpose = str(purpose).lower()
         if not isinstance(encoded_data_stream, lu.DataStream): raise Exception('encoded_data_stream is not a DataStream object')
         self.layers[purpose] = encoded_data_stream

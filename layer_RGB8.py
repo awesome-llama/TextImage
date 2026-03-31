@@ -25,7 +25,7 @@ def YUV_to_RGB(yuv: tuple):
     return ((yuv[2]+yuv[0], yuv[0], yuv[1]+yuv[0]))
 
 def is_similar(a: tuple, b: tuple, tol=0):
-    """Check if two RGB colours are similar based on a tolerance value."""
+    """Check if two RGB colors are similar based on a tolerance value."""
     if tol == 0: return a == b
     tol /= 255
     G = 0.45 # gamma
@@ -40,7 +40,7 @@ def similar_in_list(src_list, find, tol=0):
     return None
 
 def limit_RGB(col:tuple):
-    """Ensure the colour is a 3-tuple of ints in the range 0-255"""
+    """Ensure the color is a 3-tuple of ints in the range 0-255"""
     r = max(0, min(255, int(col[0])))
     g = max(0, min(255, int(col[1])))
     b = max(0, min(255, int(col[2])))
@@ -48,9 +48,9 @@ def limit_RGB(col:tuple):
 
 
 def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
-    def _add_colour(colour: tuple):
-        col_prev.appendleft(colour)
-        col_table[(colour[0]*3 + colour[1]*5 + colour[2]*7) % 94] = colour # hashed index
+    def _add_color(color: tuple):
+        col_prev.appendleft(color)
+        col_table[(color[0]*3 + color[1]*5 + color[2]*7) % 94] = color # hashed index
     
     col_prev = deque([DEFAULT_VAL] * (dimensions[0]+2), dimensions[0]+2)
     col_table = [DEFAULT_VAL] * len(lu.CHARS)
@@ -62,27 +62,27 @@ def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
         # find chunk to encode with:
         if is_similar(col, (c:=col_prev[0]), lossy_tolerance):
             chunks.append(ChunkRGB8('copy_prev'))
-            _add_colour(c)
+            _add_color(c)
             continue
 
         if is_similar(col, (c:=col_prev[dimensions[0]-2]), lossy_tolerance):
             chunks.append(ChunkRGB8('copy_vert_fwd'))
-            _add_colour(c)
+            _add_color(c)
             continue
         
         if is_similar(col, (c:=col_prev[dimensions[0]-1]), lossy_tolerance):
             chunks.append(ChunkRGB8('copy_vert'))
-            _add_colour(c)
+            _add_color(c)
             continue
 
         if is_similar(col, (c:=col_prev[dimensions[0]+0]), lossy_tolerance):
             chunks.append(ChunkRGB8('copy_vert_back'))
-            _add_colour(c)
+            _add_color(c)
             continue
         
         if (si := similar_in_list(col_table, col, lossy_tolerance)) is not None:
             chunks.append(ChunkRGB8('hash_table', 0, [si]))
-            _add_colour(col_table[si])
+            _add_color(col_table[si])
             continue
         
         in_volume = False
@@ -98,7 +98,7 @@ def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
                 else:
                     raise Exception('Volume size disallowed (waste of space)')
                 
-                _add_colour(col)
+                _add_color(col)
                 in_volume = True
                 break
         
@@ -107,7 +107,7 @@ def data_stream_to_chunks(image_array, dimensions:tuple, lossy_tolerance=0):
             ftup = lu.col_to_ftup(col)
             chunks.append(ChunkRGB8('raw', ftup[0], list(ftup[1:])))
             #chunks.append((('raw', ftup[0]), tuple(ftup[1:])))
-            _add_colour(col)
+            _add_color(col)
 
     return chunks
 
@@ -142,30 +142,30 @@ def compress(image_array:list, dimensions:tuple, lossy_tolerance=0, RLE=True, de
 def decompress(stream:str, dimensions:tuple, debug=False):
     """Decompress RGB 8 bit per channel data stream"""
 
-    def _add_colour(colour: tuple):
-        image_array.append(colour)
-        col_prev.appendleft(colour)
-        col_table[(colour[0]*3 + colour[1]*5 + colour[2]*7) % 94] = colour
+    def _add_color(color: tuple):
+        image_array.append(color)
+        col_prev.appendleft(color)
+        col_table[(color[0]*3 + color[1]*5 + color[2]*7) % 94] = color
 
     def _process_chunk(chunk: ChunkRGB8):
         match chunk.name[0]:
             case 'raw':
-                _add_colour(lu.ftup_to_col((chunk.name[1], chunk.data[0], chunk.data[1], chunk.data[2])))
+                _add_color(lu.ftup_to_col((chunk.name[1], chunk.data[0], chunk.data[1], chunk.data[2])))
 
             case 'copy_prev':
-                _add_colour(col_prev[0])
+                _add_color(col_prev[0])
 
             case 'copy_vert_fwd':
-                _add_colour(col_prev[dimensions[0] - 2])
+                _add_color(col_prev[dimensions[0] - 2])
 
             case 'copy_vert':
-                _add_colour(col_prev[dimensions[0] - 1])
+                _add_color(col_prev[dimensions[0] - 1])
 
             case 'copy_vert_back':
-                _add_colour(col_prev[dimensions[0] + 0])
+                _add_color(col_prev[dimensions[0] + 0])
 
             case 'hash_table':
-                _add_colour(col_table[chunk.data[0]])
+                _add_color(col_table[chunk.data[0]])
             
             case 'vol':
                 if chunk.size == 1:
@@ -175,7 +175,7 @@ def decompress(stream:str, dimensions:tuple, debug=False):
                 
                 YUV_diff = lu.vol_index_to_col(index, VOLUMES[chunk.name[1]][0], VOLUMES[chunk.name[1]][1])
                 col_diff = YUV_to_RGB(YUV_diff)
-                _add_colour((col_prev[0][0]+col_diff[0], col_prev[0][1]+col_diff[1], col_prev[0][2]+col_diff[2]))
+                _add_color((col_prev[0][0]+col_diff[0], col_prev[0][1]+col_diff[1], col_prev[0][2]+col_diff[2]))
 
             case _:
                 raise Exception(f'Chunk name {op_name} unknown')
