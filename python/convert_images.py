@@ -4,6 +4,7 @@ import os
 import image_io
 from PIL import Image
 
+
 def list_files(directory):
     # get all files in the directory
     files = os.listdir(directory)
@@ -12,6 +13,7 @@ def list_files(directory):
     files = [file for file in files if os.path.isfile(os.path.join(directory, file))]
     
     return files
+
 
 USE_A8_MAIN = ['submarine.png', 'tweed_volcano.png'] # images that should use A8 for the main purpose
 

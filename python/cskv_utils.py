@@ -1,11 +1,14 @@
-# Comma-separated key-value pairs... CSKV
-# https://awesome-llama.github.io/articles/my-save-code-format
+"""
+Comma-separated key-value pairs... CSKV
+https://awesome-llama.github.io/articles/my-save-code-format
 
-# utilities for reading/writing
+Utilities for reading/writing.
+"""
 
 
-def CSKV_write(data:dict, magic_number:str=None, append_comma=True, include_list_length=True) -> str:
-    """Write a CSKV string. `append_comma` ensures the final item ends with a comma. `include_list_length` inserts the number of list items immediately after the key name."""
+def CSKV_write(data:dict, magic_number:str|None=None, append_comma=True, include_list_length=True) -> str:
+    """Write a CSKV string. `append_comma` ensures the final item ends with a comma.
+    `include_list_length` inserts the number of list items immediately after the key name."""
 
     def valid_string(string:str):
         """Raise exception if string contains invalid character, otherwise return string"""
@@ -36,7 +39,9 @@ def CSKV_write(data:dict, magic_number:str=None, append_comma=True, include_list
 
 
 def CSKV_read(data:str, remove_magic_number=False, remove_end_comma=True, remove_list_length=False) -> dict: 
-    """Read a CSKV string and return a dictionary. Params make assumptions on the written data as the format does not specify it. See `CSKV_write` for their purpose."""
+    """Read a CSKV string and return a dictionary.
+    Params make assumptions on the written data as the format does not specify it.
+    See `CSKV_write` for their purpose."""
     
     items = str(data).split(',')
     if remove_magic_number: items.pop(0)
