@@ -14,5 +14,5 @@ for i, vol in enumerate(layer_RGB8.VOLUMES):
     output_vols.append(f'{vol[1][2]}\n') # z1
     output_vols.append(f'{vol[2]}\n') # size
 
-with open('output/RGB8_vols_scratch.txt', 'w') as f:
+with open('goboscript/data/TextImage_volumes.txt', 'w') as f:
     f.writelines(output_vols)

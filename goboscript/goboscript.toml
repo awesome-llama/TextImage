@@ -1,0 +1,5 @@
+frame_rate = 60
+no_miscellaneous_limits = true
+no_sprite_fencing = true
+high_quality_pen = false
+bitmap_resolution = 2
